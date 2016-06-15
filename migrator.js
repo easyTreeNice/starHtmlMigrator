@@ -91,14 +91,28 @@ function extract() {
     return data;
 }
 
+function prettifyJSON(ob) {
+    var ta = $('<textarea></textarea>');
+    ta.text(JSON.stringify(ob, null, '   '));
+    return ta.text();
+}
+
 function display(data) {
-    var json = JSON.stringify(data);
+    var json = prettifyJSON(data);
     $('body').prepend([
-        "<div id='output' class='collapsed' title='click to expand/collapse'>",
-        "<h2>Extracted data as JSON:</h2><pre>",
+        "<textarea id='output' class='collapsed' title='click to expand/collapse'>",
+        "Extracted data as JSON:",
         json,
-        "</pre></div>"
+        "</textarea>"
     ].join(''));
+    $('body').on('click', '#output', function() {
+        var output = $(this);
+        if (output.hasClass('collapsed')) {
+            output.removeClass('collapsed');
+        } else {
+            output.addClass('collapsed');
+        }
+    });
 }
 
 $(function () {
