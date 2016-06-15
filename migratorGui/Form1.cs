@@ -24,7 +24,7 @@ namespace migratorGui
         {
             InitializeComponent();
 
-            exportFolder.Text = @"N:\dev\starHtmlMigrator_\LocalOnly";
+            //exportFolder.Text = @"N:\dev\starHtmlMigrator_\LocalOnly";
 
             one = fileList.Left;
             two = findFilesButton.Left - fileList.Right;
@@ -47,8 +47,8 @@ namespace migratorGui
             "integrity='sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0=' " +
             "crossorigin='anonymous'" +
             "></script>" +
-            "<script src = '../migrator.js' ></script>" +
-            "<link href='../migrator.css' rel='stylesheet' type='text/css'>";
+            "<script src = '../../migrator.js'></script>" +
+            "<link href='../../migrator.css' rel='stylesheet' type='text/css'>";
 
         private void findFilesButton_Click(object sender, EventArgs e)
         {
@@ -61,12 +61,18 @@ namespace migratorGui
             FilePaths = Directory.GetFiles(FolderPath)
                 .Where(f => f.ToLower().EndsWith(".html"))
                 .ToList();
+            if (!FilePaths.Any())
+            {
+                AddMessage($"No html files found at \"{FolderPath}\"");
+            }
 
             var files = FilePaths
                 .Select(Path.GetFileName)
                 .ToList();
             
             files.ForEach(f => fileList.Items.Add(f));
+
+            AddMessage($"Files found. Now press 'Add Bootstrap'");
         }
 
         static Regex reRemoveCssAndScript = new Regex(
