@@ -42,7 +42,8 @@ function extract() {
                 var f = $(elem);
                 fields.push({
                     name: $(f.find('>label')).text().trim(),
-                    value: $(f.find('>div')).text().trim()
+                    value: $(f.find('>div')).text().trim(),
+                    fieldId: $(f.find('>div>*:first-child')).attr('id').trim()
                 });
             });
         return fields;
@@ -76,9 +77,11 @@ function extract() {
                 $.each(tds,
                     function (idx, td) {
                         if (idx === 0) return;
+                        td = $(td);
                         fields.push({
                             column: colulmnTitles[idx],
-                            fields: getColumnFields($(td))
+                            columnId: td.attr('id'),
+                            fields: getColumnFields(td)
                         });
                     });
                 return fields;
@@ -99,12 +102,34 @@ function prettifyJSON(ob) {
     return ta.text();
 }
 
-function display(data) {
+function displayAsJSON(data) {
     var json = prettifyJSON(data);
     $('body').prepend([
         "<textarea id='output' class='collapsed' title='click to expand/collapse'>",
         "Extracted data as JSON:",
         json,
+        "</textarea>"
+    ].join(''));
+    $('body').on('click', '#output', function() {
+        var output = $(this);
+        if (output.hasClass('collapsed')) {
+            output.removeClass('collapsed');
+        } else {
+            output.addClass('collapsed');
+        }
+    });
+}
+
+function prettifyXML(ob) {
+    
+}
+
+function displayAsXML(data) {
+    var xml = prettifyXML(data);
+    $('body').prepend([
+        "<textarea id='output' class='collapsed' title='click to expand/collapse'>",
+        "Extracted data as JSON:",
+        xml,
         "</textarea>"
     ].join(''));
     $('body').on('click', '#output', function() {
@@ -131,8 +156,9 @@ var qs = (function (a) {
 })(window.location.search.substr(1).split('&'));
 
 $(function () {
-    var demo = parseInt(qs['demo'], 10);
+	var demo = parseInt(qs['demo'] || "2", 10);
     if (demo >= 1) visualTidy();
     var data = extract();
-    if (demo >= 2) display(data);
+    if (demo === 2) displayAsJSON(data);
+    if (demo === 3) displayAsXML(data);
 });
