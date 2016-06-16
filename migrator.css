@@ -1,16 +1,16 @@
-#output {
+#output, #citationOutput {
     border: 3px solid black;
     cursor: pointer;
-    overflow: scroll;
-    width: 100%;
+    overflow: auto;
+    white-space: nowrap;
+    height: 100%;
+    width: 50%;
     font-size: 12pt;
 }
-#output {
-    height: 100%;
-}
-#output.collapsed {
+#output.collapsed, #citationOutput.collapsed {
     height: 200px;
 }
+
 .datagrid {
     border: 3px solid black;
 }

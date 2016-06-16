@@ -10,7 +10,7 @@
             $(selector).css({ display: 'none' });
         }
         // break the height-limited scrollihg div
-        $('#assignedstudydata-div-').attr('style', '');
+        $('#assignedstudydata-div').attr('style', '');
 
         // remove inline style
         $('*[style]').attr('style', '');
@@ -136,27 +136,39 @@
 
     function displayAsJSON(data) {
         var json = prettifyJSON(data);
+        var citations = getCitations(data);
         var body = $('body');
 
+        body.prepend([
+            "<textarea id='citationOutput' class='collapsed' title='click to expand/collapse'>",
+            citations,
+            "</textarea>"
+        ].join(''));
         body.prepend([
             "<textarea id='output' class='collapsed' title='click to expand/collapse'>",
             json,
             "</textarea>"
         ].join(''));
 
-        body.prepend($("<button id='copyCitationList'>Copy Citation list to clipboard</button>"));
+        //body.prepend($("<button id='copyCitationList'>Copy Citation list to clipboard</button>"));
 
-        body.on('click', '#output', function () {
-            var output = $(this);
-            if (output.hasClass('collapsed')) {
-                output.removeClass('collapsed');
+        function toggle(target) {
+            if (target.hasClass('collapsed')) {
+                target.removeClass('collapsed');
             } else {
-                output.addClass('collapsed');
+                target.addClass('collapsed');
             }
-        }).on('click', '#copyCitationList', function () {
-            var citations = getCitations(data);
-            window.prompt("Copy to clipboard: Ctrl+C, Enter", citations);
-        });
+        }
+
+        body.on('click', '#output,#citationOutput', function () {
+            toggle($('#output'));
+            toggle($('#citationOutput'));
+        })
+            //.on('click', '#copyCitationList', function () {
+            //var citations = getCitations(data);
+            //window.prompt("Copy to clipboard: Ctrl+C, Enter", citations);
+            //})
+        ;
     }
 
     var qs = (function (a) {
