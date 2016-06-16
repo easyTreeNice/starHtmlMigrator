@@ -59,7 +59,6 @@ namespace migratorGui
             fileList.Items.Clear();
             StartSession();
 
-            FolderPath = exportFolder.Text.Trim();
             if (!Directory.Exists(FolderPath))
             {
                 AddMessage("Folder doesn't exist. Aborting.");
@@ -73,6 +72,7 @@ namespace migratorGui
                 AddMessage($"No html files found at \"{FolderPath}\". Aborting.");
                 return;
             }
+            processFilesButton.Enabled = true;
 
             var files = FilePaths
                 .Select(Path.GetFileName)
@@ -149,6 +149,12 @@ namespace migratorGui
 
             fileList.Width += deltaA;
             processedFiles.Width += deltaB;
+        }
+
+        private void exportFolder_TextChanged(object sender, EventArgs e)
+        {
+            processFilesButton.Enabled = false;
+            FolderPath = exportFolder.Text.Trim();
         }
     }
 }

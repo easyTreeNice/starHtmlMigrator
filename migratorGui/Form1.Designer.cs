@@ -52,6 +52,7 @@
             this.exportFolder.Name = "exportFolder";
             this.exportFolder.Size = new System.Drawing.Size(284, 20);
             this.exportFolder.TabIndex = 1;
+            this.exportFolder.TextChanged += new System.EventHandler(this.exportFolder_TextChanged);
             // 
             // findFilesButton
             // 
@@ -74,6 +75,7 @@
             // 
             // processFilesButton
             // 
+            this.processFilesButton.Enabled = false;
             this.processFilesButton.Location = new System.Drawing.Point(304, 57);
             this.processFilesButton.Name = "processFilesButton";
             this.processFilesButton.Size = new System.Drawing.Size(117, 23);

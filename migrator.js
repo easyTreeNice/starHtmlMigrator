@@ -58,7 +58,7 @@
             return titles;
         })();
 
-        var data = [];
+        var studies = [];
         $('#assignedstudydata-table > tbody > tr')
             .each(function (idx, elem) {
                 var tr = $(this);
@@ -87,12 +87,13 @@
                     return fields;
                 })();
 
-                data.push({
+                studies.push({
                     studyId: id,
                     columns: rowColumns
                 });
             });
 
+        var data = { studies: studies };
         return data;
     }
 
@@ -104,14 +105,33 @@
     }
 
     function getCitations(data) {
-        return "";
-        //var projection = [];
-        //$.each(data, function(idx, study) {
-        //    projection.push([
-        //        study.studyId,
-        //        study.columns
-        //    ].join (','));
-        //});
+        function getFullCitation(study) {
+            var fc = "";
+
+            $.each(study.columns,
+                function(idx, col) {
+                    if (col.column === "Study details") {
+                        $.each(col.fields,
+                            function(idx, field) {
+                                if (field.name === "Full citation") {
+                                    fc = field.value;
+                                }
+                            });
+                    }
+                });
+
+            return fc;
+        }
+
+        var projection = [];
+        $.each(data.studies, function(idx, study) {
+            projection.push([
+                study.studyId,
+                getFullCitation(study)
+            ].join (','));
+        });
+
+        return projection.join('\r\n');
     }
 
     function displayAsJSON(data) {
@@ -124,7 +144,6 @@
             "</textarea>"
         ].join(''));
 
-        body.prepend($("<button id='copyAllJson'>Copy All JSON to clipboard</button>"));
         body.prepend($("<button id='copyCitationList'>Copy Citation list to clipboard</button>"));
 
         body.on('click', '#output', function () {
@@ -134,11 +153,9 @@
             } else {
                 output.addClass('collapsed');
             }
-        }).on('click', '#copyAllJson', function () {
-            window.prompt("Copy to clipboard: Ctrl+C, Enter", json);
         }).on('click', '#copyCitationList', function () {
             var citations = getCitations(data);
-            window.prompt("Copy to clipboard: Ctrl+C, Enter", json);
+            window.prompt("Copy to clipboard: Ctrl+C, Enter", citations);
         });
     }
 
