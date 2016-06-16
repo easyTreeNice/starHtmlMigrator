@@ -24,7 +24,7 @@ namespace migratorGui
         {
             InitializeComponent();
 
-            //exportFolder.Text = @"N:\dev\starHtmlMigrator_\LocalOnly";
+            exportFolder.Text = @"N:\dev\starHtmlMigrator\LocalOnly";
 
             one = fileList.Left;
             two = findFilesButton.Left - fileList.Right;
@@ -42,20 +42,27 @@ namespace migratorGui
             messages.Text = $"{++_messageCounter}. {message}{Environment.NewLine}" + messages.Text;
         }
 
+        void StartSession()
+        {
+            AddMessage($"Starting session at {GetNow()}");
+        }
+
         private string _bootstrapCode = 
             "<script src = 'http://code.jquery.com/jquery-3.0.0.min.js' " + 
             "integrity='sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0=' " +
             "crossorigin='anonymous'" +
             "></script>" +
-            "<script src = '../../migrator.js'></script>" +
-            "<link href='../../migrator.css' rel='stylesheet' type='text/css'>";
+            "<script src = '../../migrator.js'></script>";
 
         private void findFilesButton_Click(object sender, EventArgs e)
         {
+            fileList.Items.Clear();
+            StartSession();
+
             FolderPath = exportFolder.Text.Trim();
             if (!Directory.Exists(FolderPath))
             {
-                AddMessage("Folder doesn't exist. Aborting");
+                AddMessage("Folder doesn't exist. Aborting.");
                 return;
             }
             FilePaths = Directory.GetFiles(FolderPath)
@@ -63,7 +70,8 @@ namespace migratorGui
                 .ToList();
             if (!FilePaths.Any())
             {
-                AddMessage($"No html files found at \"{FolderPath}\"");
+                AddMessage($"No html files found at \"{FolderPath}\". Aborting.");
+                return;
             }
 
             var files = FilePaths
@@ -72,8 +80,14 @@ namespace migratorGui
             
             files.ForEach(f => fileList.Items.Add(f));
 
-            AddMessage($"Files found. Now press 'Add Bootstrap'");
+            AddMessage($"Files found. Please press the 'Add Bootstrap' button.");
         }
+
+        string GetNow()
+        {
+            return DateTime.Now.ToString("yyyy.MM.dd-HH.mm.ss");
+        }
+
 
         static Regex reRemoveCssAndScript = new Regex(
             "(?ims)(?<script>\\<script.+?\\<\\/script\\>)|(?<style>\\<link.+?type=\\\"text/css\"[^>]*\\>)"
@@ -86,10 +100,9 @@ namespace migratorGui
 
             selectedFiles = FilePaths;
 
-            var now = DateTime.Now;
             var outputFolderPath = Path.Combine(
                 FolderPath, 
-                now.ToString("yyyy.MM.dd-HH.mm.ss")
+                GetNow()
             );
             var prefix = $"{FolderPath}\\";
             processedFiles.Items.Clear();
@@ -109,6 +122,10 @@ namespace migratorGui
 
                 processedFiles.Items.Add(outputFilePath.Replace(prefix, string.Empty));
             });
+            var relPath = outputFolderPath.Replace(prefix, string.Empty);
+            AddMessage($"Modified files written to newly-created sub-folder: \"{relPath}\". Please open them in your browser.");
+
+            Process.Start(outputFolderPath);
         }
 
         private void Form1_SizeChanged(object sender, EventArgs e)
