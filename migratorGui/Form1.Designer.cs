@@ -35,6 +35,10 @@
             this.processFilesButton = new System.Windows.Forms.Button();
             this.processedFiles = new System.Windows.Forms.ListBox();
             this.messages = new System.Windows.Forms.TextBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.ToJSON = new System.Windows.Forms.RadioButton();
+            this.ToRIS = new System.Windows.Forms.RadioButton();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -102,11 +106,44 @@
             this.messages.Size = new System.Drawing.Size(698, 100);
             this.messages.TabIndex = 6;
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.ToRIS);
+            this.groupBox1.Controls.Add(this.ToJSON);
+            this.groupBox1.Location = new System.Drawing.Point(304, 86);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(117, 72);
+            this.groupBox1.TabIndex = 7;
+            this.groupBox1.TabStop = false;
+            // 
+            // ToJSON
+            // 
+            this.ToJSON.AutoSize = true;
+            this.ToJSON.Checked = true;
+            this.ToJSON.Location = new System.Drawing.Point(7, 19);
+            this.ToJSON.Name = "ToJSON";
+            this.ToJSON.Size = new System.Drawing.Size(87, 17);
+            this.ToJSON.TabIndex = 0;
+            this.ToJSON.TabStop = true;
+            this.ToJSON.Text = "Create JSON";
+            this.ToJSON.UseVisualStyleBackColor = true;
+            // 
+            // ToRIS
+            // 
+            this.ToRIS.AutoSize = true;
+            this.ToRIS.Location = new System.Drawing.Point(7, 43);
+            this.ToRIS.Name = "ToRIS";
+            this.ToRIS.Size = new System.Drawing.Size(77, 17);
+            this.ToRIS.TabIndex = 0;
+            this.ToRIS.Text = "Create RIS";
+            this.ToRIS.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(726, 362);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.messages);
             this.Controls.Add(this.processedFiles);
             this.Controls.Add(this.processFilesButton);
@@ -119,6 +156,8 @@
             this.Name = "Form1";
             this.Text = "STAR migrator GUI";
             this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -133,6 +172,9 @@
         private System.Windows.Forms.Button processFilesButton;
         private System.Windows.Forms.ListBox processedFiles;
         private System.Windows.Forms.TextBox messages;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.RadioButton ToRIS;
+        private System.Windows.Forms.RadioButton ToJSON;
     }
 }
 

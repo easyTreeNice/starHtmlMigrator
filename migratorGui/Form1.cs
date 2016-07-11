@@ -47,12 +47,32 @@ namespace migratorGui
             AddMessage($"Starting session at {GetNow()}");
         }
 
-        private string _bootstrapCode = 
-            "<script src = 'http://code.jquery.com/jquery-3.0.0.min.js' " + 
-            "integrity='sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0=' " +
-            "crossorigin='anonymous'" +
-            "></script>" +
-            "<script src = '../../migrator.js'></script>";
+        private string GetAncestor(string originalFolder, int generations)
+        {
+            var path = originalFolder;
+            for (var i = 0; i < generations; i++)
+            {
+                path = Directory.GetParent(path).ToString();
+            }
+
+            return path;
+        }
+
+        private string GetBootstrapCode()
+        {
+            var exeFolder = Path.GetDirectoryName(Application.ExecutablePath) ?? string.Empty;
+            var assetsFolderPath = GetAncestor(exeFolder, 3);
+            var assetsFolderUri = new Uri(assetsFolderPath).AbsoluteUri;
+            var suffix = ToJSON.Checked ? "JSON" : ToRIS.Checked ? "RIS" : null;
+
+            var bootstrapCode = $"<link href='{assetsFolderUri}/migrator.css' rel='stylesheet' type='text/css'>" +
+                                "<script src = 'http://code.jquery.com/jquery-3.0.0.min.js' " +
+                                "integrity='sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0=' " +
+                                "crossorigin='anonymous'" +
+                                "></script>" +
+                                $"<script src = '{assetsFolderUri}/migrator_{suffix}.js'></script>";
+            return bootstrapCode;
+        }
 
         private void findFilesButton_Click(object sender, EventArgs e)
         {
@@ -116,7 +136,7 @@ namespace migratorGui
                 var input = File.ReadAllText(f);
                 var output =
                     reRemoveCssAndScript.Replace(input, string.Empty)
-                    .Replace("<head>", "<head>" + _bootstrapCode);
+                    .Replace("<head>", "<head>" + GetBootstrapCode());
 
                 File.WriteAllText(outputFilePath, output);
 

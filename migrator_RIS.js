@@ -1,7 +1,5 @@
 (function() {
     function visualTidy() {
-        $('head').append('<link href="../../migrator.css" rel="stylesheet" type="text/css">');
-
         function hilight(selector, colorCode) {
             colorCode = colorCode || 'pink';
             $(selector).css({ backgroundColor: colorCode });
@@ -30,25 +28,13 @@
         hide('#quick-links-content');
         hide('#copyright');
         hide('.gridcontrols');
+        hide('#fieldPicker');
+        hide('#unreviewedstudies');
+        hide('.status');
+        hide('.bulkactions');
     }
 
     function extract() {
-        var studyFieldNames = [];
-
-        function getColumnFields(td) {
-            var fields = [];
-            td.find('>.assignedstudyfield')
-                .each(function (idx, elem) {
-                    var f = $(elem);
-                    fields.push({
-                        name: $(f.find('>label')).text().trim(),
-                        value: $(f.find('>div')).text().trim(),
-                        fieldId: $(f.find('>div>*:first-child')).attr('id').trim()
-                    });
-                });
-            return fields;
-        }
-
         var colulmnTitles = (function () {
             var titles = [];
             $('#assignedstudy-table > thead > tr > th')
@@ -58,42 +44,34 @@
             return titles;
         })();
 
-        var studies = [];
+        var citations = [];
         $('#assignedstudy-table > tbody > tr')
             .each(function (idx, elem) {
                 var tr = $(this);
                 var id = tr.attr('id');
                 var tds = tr.find('>td');
 
-                var tdCb = tds[0];
-                var tdStudyDetails = tds[1];
-                var tdPopulation = tds[2];
-                var tdIntervientionComparator = tds[3];
-                var tdResults = tds[4];
-                var tdNotes = tds[5];
-
-                var rowColumns = (function () {
-                    var fields = [];
-                    $.each(tds,
-                        function (idx, td) {
-                            if (idx === 0) return;
-                            td = $(td);
-                            fields.push({
-                                column: colulmnTitles[idx],
-                                columnId: td.attr('id'),
-                                fields: getColumnFields(td)
-                            });
+                var fields = (function () {
+                    var values = [];
+                    $.each(tds, function (idx, td) {
+                        if (idx === 0) return;
+                        td = $(td);
+                        values.push({
+                            column: colulmnTitles[idx],
+                            columnId: td.attr('id'),
+                            value: td.text().trim()
                         });
-                    return fields;
+                    });
+                    return values;
                 })();
 
-                studies.push({
-                    studyId: id,
-                    columns: rowColumns
+                citations.push({
+                    id: id,
+                    fields: fields
                 });
             });
 
-        var data = { studies: studies };
+        var data = { citations: citations };
         return data;
     }
 
@@ -104,44 +82,131 @@
         return ta.text();
     }
 
-    function getCitations(data) {
-        function getFullCitation(study) {
+    var pagesRegex = /([0-9]+)(-)?([0-9]+)?/;
+    var auRegex = /([^,]+),([^,]+)/g;
+    function getTrimmedAuthors(str) {
+        var aus = [];
+
+        function push(m) {
+            aus.push(m[1].trim() + "," + m[2].trim());
+        }
+
+        var match = auRegex.exec(str);
+        while (match != null) {
+            push(match);
+            match = auRegex.exec(str);
+        }
+
+        return aus;
+    }
+
+    function getRisText(data) {
+        var lines = [];
+
+        function appendLine(code, value) {
+            lines.push(code + "  - " + (value || ''));
+        }
+
+        function appendRisRecord(citation) {
             var fc = "";
 
-            $.each(study.columns,
-                function(idx, col) {
-                    if (col.column === "Study details") {
-                        $.each(col.fields,
-                            function(idx, field) {
-                                if (field.name === "Full citation") {
-                                    fc = field.value;
-                                }
-                            });
-                    }
-                });
+            appendLine('TY');
+            
+            $.each(citation.fields, function (idx, field) {
+                switch (field.column) {
+                    case "Author":
+                        var aus = getTrimmedAuthors(field.value);
+                        $.each(aus, function (idx, au) {
+                            appendLine('AU', au.trim());
+                        });
+                        break;
+                    case "Date":
+                        appendLine('PY', field.value);
+                        break;
+                    case "Title":
+                        appendLine('TI', field.value);
+                        break;
+                    case "Notes":
+                        appendLine('N1', field.value);
+                        break;
+                    case "Status":
+                        appendLine('C1', field.Value);
+
+                        // Use this opportunity to write out the id
+                        appendLine('ID', citation.id);
+                        appendLine('U1', citation.id);
+                        break;
+                    case "Volume":  // THIS IS NOT PART OF THE HTML!!!
+                        appendLine('VL', field.value);
+                        break;
+                    case "Number":  // THIS IS NOT PART OF THE HTML!!!
+                        appendLine('IS', field.value);
+                        break;
+                    case "Pages":
+                        var match = pagesRegex.exec(field.value);
+                        if (match != null) {
+                            var fromPage = match[1];
+
+                            appendLine('SP', fromPage);
+
+                            if (match[2] === '-') {
+                                appendLine('EP', match[3]);
+                            }
+                        }
+                        break;
+                    case "Study Type":
+                        appendLine('C3', field.value);
+                        break;
+                    case "Study Sub Type":
+                        appendLine('C4', field.value);
+                        break;
+                    case "Status Date":
+                        appendLine('C5', field.value);
+                        break;
+                    case "Periodical":
+                        appendLine('T2', field.value);
+                        break;
+                    case "Abstract":
+                        appendLine('AB', field.value);
+                        break;
+                    case "Keywords":
+                        var items = field.value.split(',');
+                        $.each(items, function (idx, item) {
+                            appendLine('KW', item.trim());
+                        });
+                        break;
+                    case "Reviewer comments":
+                        appendLine('C6', field.value);
+                        break;
+
+
+                    case "Reason for exclusion":
+                        // do nothing
+                        break;
+                }
+            });
+
+            appendLine('ER');
 
             return fc;
         }
 
-        var projection = [];
-        $.each(data.studies, function(idx, study) {
-            projection.push([
-                study.studyId,
-                getFullCitation(study)
-            ].join (','));
+        $.each(data.citations, function(idx, citation) {
+            appendRisRecord(citation);
         });
 
-        return projection.join('\r\n');
+        var risText = lines.join('\r\n');
+
+        return risText;
     }
 
-    function displayAsJSON(data) {
-        var json = prettifyJSON(data);
-        var citations = getCitations(data);
+    function displayOutput(data) {
+        var json = prettifyJSON(data.citations);
         var body = $('body');
-
+        var risText = getRisText(data);
         body.prepend([
-            "<textarea id='citationOutput' class='collapsed' title='click to expand/collapse'>",
-            citations,
+            "<textarea id='risOutput' class='collapsed' title='click to expand/collapse'>",
+            risText,
             "</textarea>"
         ].join(''));
         body.prepend([
@@ -149,8 +214,6 @@
             json,
             "</textarea>"
         ].join(''));
-
-        //body.prepend($("<button id='copyCitationList'>Copy Citation list to clipboard</button>"));
 
         function toggle(target) {
             if (target.hasClass('collapsed')) {
@@ -160,14 +223,10 @@
             }
         }
 
-        body.on('click', '#output,#citationOutput', function () {
+        body.on('click', '#output,#risOutput', function () {
             toggle($('#output'));
             toggle($('#citationOutput'));
         })
-            //.on('click', '#copyCitationList', function () {
-            //var citations = getCitations(data);
-            //window.prompt("Copy to clipboard: Ctrl+C, Enter", citations);
-            //})
         ;
     }
 
@@ -188,7 +247,7 @@
         var demo = parseInt(qs['demo'] || "2", 10);
         if (demo >= 1) visualTidy();
         var data = extract();
-        if (demo >= 2) displayAsJSON(data);
+        if (demo >= 2) displayOutput(data);
     }
 
     $(function() {

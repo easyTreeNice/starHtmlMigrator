@@ -1,14 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25029.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "migratorGui", "migratorGui.csproj", "{94EC0FBB-BB7A-4C89-8A3B-B1DA624BBA43}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{803B173D-1626-4188-AD2E-2DAB8BDD1AA5}"
 	ProjectSection(SolutionItems) = preProject
 		..\migrator.css = ..\migrator.css
-		..\migrator.js = ..\migrator.js
+		..\migrator_JSON.js = ..\migrator_JSON.js
+		..\migrator_RIS.js = ..\migrator_RIS.js
 	EndProjectSection
 EndProject
 Global

@@ -1,7 +1,5 @@
 (function() {
     function visualTidy() {
-        $('head').append('<link href="../../migrator.css" rel="stylesheet" type="text/css">');
-
         function hilight(selector, colorCode) {
             colorCode = colorCode || 'pink';
             $(selector).css({ backgroundColor: colorCode });
