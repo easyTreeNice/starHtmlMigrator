@@ -19,6 +19,8 @@
         target.prepend(['<thead>', '<tr>', row.html(), '</tr>', '</thead>'].join(''));
         row.css({ display: "none" });
 
+        $('div.page').addClass('page-scroller');
+
         // hide clutter
         hide('#messages');
         hide('#header');
@@ -45,31 +47,34 @@
         })();
 
         var citations = [];
-        $('#assignedstudy-table > tbody > tr')
-            .each(function (idx, elem) {
-                var tr = $(this);
-                var id = tr.attr('id');
-                var tds = tr.find('>td');
+        var rows = $('#assignedstudy-table > tbody > tr');
+        var len = rows.length;
+        rows.each(function (idx, elem) {
+            showProgress('extract', idx + 1, len);
 
-                var fields = (function () {
-                    var values = [];
-                    $.each(tds, function (idx, td) {
-                        if (idx === 0) return;
-                        td = $(td);
-                        values.push({
-                            column: colulmnTitles[idx],
-                            columnId: td.attr('id'),
-                            value: td.text().trim()
-                        });
+            var tr = $(this);
+            var id = tr.attr('id');
+            var tds = tr.find('>td');
+
+            var fields = (function () {
+                var values = [];
+                $.each(tds, function (idx, td) {
+                    if (idx === 0) return;
+                    td = $(td);
+                    values.push({
+                        column: colulmnTitles[idx],
+                        columnId: td.attr('id'),
+                        value: td.text().trim()
                     });
-                    return values;
-                })();
-
-                citations.push({
-                    id: id,
-                    fields: fields
                 });
+                return values;
+            })();
+
+            citations.push({
+                id: id,
+                fields: fields
             });
+        });
 
         var data = { citations: citations };
         return data;
@@ -100,17 +105,26 @@
         return aus;
     }
 
+    function sleepFor(sleepDuration) {
+        var now = new Date().getTime();
+        while (new Date().getTime() < now + sleepDuration) {}
+    }
+
+    function showProgress(msg, itemNumber, total) {
+        $('title').text(msg + " - " + itemNumber + ' / ' + total);
+    }
+
     function getRisText(data) {
         var lines = [];
 
         function appendLine(code, value) {
-            lines.push(code + "  - " + (value || ''));
+            lines.push(code + (!!code ? "  - " : "") + (value || ''));
         }
 
         function appendRisRecord(citation) {
             var fc = "";
 
-            appendLine('TY');
+            appendLine('TY', 'JOUR');
             
             $.each(citation.fields, function (idx, field) {
                 switch (field.column) {
@@ -130,7 +144,7 @@
                         appendLine('N1', field.value);
                         break;
                     case "Status":
-                        appendLine('C1', field.Value);
+                        appendLine('C1', field.value);
 
                         // Use this opportunity to write out the id
                         appendLine('ID', citation.id);
@@ -187,11 +201,14 @@
             });
 
             appendLine('ER');
+            appendLine();
 
             return fc;
         }
 
-        $.each(data.citations, function(idx, citation) {
+        var len = data.citations.length;
+        $.each(data.citations, function (idx, citation) {
+            showProgress('get RIS', idx + 1, len);
             appendRisRecord(citation);
         });
 
@@ -204,6 +221,7 @@
         var json = prettifyJSON(data.citations);
         var body = $('body');
         var risText = getRisText(data);
+        showProgress('displaying output...', 0, 1);
         body.prepend([
             "<textarea id='risOutput' class='collapsed' title='click to expand/collapse'>",
             risText,
@@ -225,9 +243,9 @@
 
         body.on('click', '#output,#risOutput', function () {
             toggle($('#output'));
-            toggle($('#citationOutput'));
-        })
-        ;
+            toggle($('#risOutput'));
+            toggle($('.page-scroller'));
+        });
     }
 
     var qs = (function (a) {

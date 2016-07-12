@@ -1,14 +1,21 @@
-#output, #citationOutput,#risOutput {
+.page-scroller {
+    overflow: auto;
+    height: 75%;
+}
+.page-scroller.collapsed {
+    height: 50%;
+}
+#output, #citationOutput, #risOutput {
     border: 3px solid black;
     cursor: pointer;
     overflow: auto;
     white-space: nowrap;
-    height: 100%;
+    height: 50%;
     width: 50%;
     font-size: 12pt;
 }
-#output.collapsed, #citationOutput.collapsed {
-    height: 200px;
+#output.collapsed, #citationOutput.collapsed, #risOutput.collapsed {
+    height: 20%;
 }
 
 .datagrid {

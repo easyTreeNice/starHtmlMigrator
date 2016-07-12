@@ -24,7 +24,10 @@ namespace migratorGui
         {
             InitializeComponent();
 
-            exportFolder.Text = @"N:\dev\starHtmlMigrator\LocalOnly";
+            //exportFolder.Text = @"N:\dev\starHtmlMigrator\LocalOnly";
+            exportFolder.Text = Properties.Settings.Default.RootFolder;
+            ToJSON.Checked = !Properties.Settings.Default.ToRIS;
+            ToRIS.Checked = Properties.Settings.Default.ToRIS;
 
             one = fileList.Left;
             two = findFilesButton.Left - fileList.Right;
@@ -61,7 +64,7 @@ namespace migratorGui
         private string GetBootstrapCode()
         {
             var exeFolder = Path.GetDirectoryName(Application.ExecutablePath) ?? string.Empty;
-            var assetsFolderPath = GetAncestor(exeFolder, 3);
+            var assetsFolderPath = GetAncestor(exeFolder, Properties.Settings.Default.AssetFolderAncestorGenerations);
             var assetsFolderUri = new Uri(assetsFolderPath).AbsoluteUri;
             var suffix = ToJSON.Checked ? "JSON" : ToRIS.Checked ? "RIS" : null;
 
@@ -76,6 +79,9 @@ namespace migratorGui
 
         private void findFilesButton_Click(object sender, EventArgs e)
         {
+            Properties.Settings.Default.RootFolder = exportFolder.Text.Trim();
+            Properties.Settings.Default.Save();
+
             fileList.Items.Clear();
             StartSession();
 
@@ -114,6 +120,9 @@ namespace migratorGui
         );
         private void processFiles_Click(object sender, EventArgs e)
         {
+            Properties.Settings.Default.ToRIS = ToRIS.Checked;
+            Properties.Settings.Default.Save();
+
             var selectedFiles = fileList.SelectedIndices.Cast<int>()
                 .Select(i => FilePaths[i])
                 .ToList();
