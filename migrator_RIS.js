@@ -118,7 +118,7 @@
         var lines = [];
 
         function appendLine(code, value) {
-            lines.push(code + (!!code ? "  - " : "") + (value || ''));
+            lines.push((code || "") + (!!code ? "  - " : "") + (value || ''));
         }
 
         function appendRisRecord(citation) {
