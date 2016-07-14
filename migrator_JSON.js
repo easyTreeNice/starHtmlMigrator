@@ -30,6 +30,20 @@
         hide('.gridcontrols');
     }
 
+    function extractFieldValue(name, fieldContainer) {
+        var value;
+        switch (name) {
+            case 'Quality score':
+                value = fieldContainer.find('>div>input').attr('value').trim();
+                break;
+            default:
+                value = fieldContainer.find('>div').html().trim();
+                break;
+        }
+
+        return value;
+    }
+
     function extract() {
         var studyFieldNames = [];
 
@@ -38,9 +52,10 @@
             td.find('>.assignedstudyfield')
                 .each(function (idx, elem) {
                     var f = $(elem);
+                    var name = $(f.find('>label')).text().trim();
                     fields.push({
-                        name: $(f.find('>label')).text().trim(),
-                        value: $(f.find('>div')).text().trim(),
+                        name: name,
+                        value: extractFieldValue(name, f),
                         fieldId: $(f.find('>div>*:first-child')).attr('id').trim()
                     });
                 });
@@ -62,13 +77,6 @@
                 var tr = $(this);
                 var id = tr.attr('id');
                 var tds = tr.find('>td');
-
-                var tdCb = tds[0];
-                var tdStudyDetails = tds[1];
-                var tdPopulation = tds[2];
-                var tdIntervientionComparator = tds[3];
-                var tdResults = tds[4];
-                var tdNotes = tds[5];
 
                 var rowColumns = (function () {
                     var fields = [];
