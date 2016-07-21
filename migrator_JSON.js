@@ -99,7 +99,21 @@
                 });
             });
 
-        var data = { studies: studies };
+        var titleRegex = /(.*)(?:\(\))/;
+        var reviewTitle = (function() {
+            var html = $('#main > h2').text().trim();
+            var titleRegex = /(.*)(?:\(step [0-9]+ and [0-9]+ search(?:es)?\))/;
+            var match = titleRegex.exec(html);
+            var title = !!match ? match[1].trim() : "";
+            return title;
+        })();
+
+        var data = {
+            review: {
+                title: reviewTitle
+            },
+            studies: studies
+        };
         return data;
     }
 
