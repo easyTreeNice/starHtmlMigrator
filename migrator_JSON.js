@@ -105,6 +105,10 @@
             var titleRegex = /(.*)(?:\(step [0-9]+ and [0-9]+ search(?:es)?\))/;
             var match = titleRegex.exec(html);
             var title = !!match ? match[1].trim() : "";
+            var maxLen = 255;
+            if (title && title.length > maxLen) {
+                title = title.substr(0, maxLen);
+            }
             return title;
         })();
 
