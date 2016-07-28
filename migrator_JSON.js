@@ -1,4 +1,7 @@
 (function() {
+    function trimmed(str) {
+        return !!str ? str.trim() : str;
+    }
     function visualTidy() {
         function hilight(selector, colorCode) {
             colorCode = colorCode || 'pink';
@@ -34,10 +37,10 @@
         var value;
         switch (name) {
             case 'Quality score':
-                value = fieldContainer.find('>div>input').attr('value').trim();
+                value = trimmed(fieldContainer.find('>div>input').attr('value'));
                 break;
             default:
-                value = fieldContainer.find('>div').html().trim();
+                value = trimmed(fieldContainer.find('>div').html());
                 break;
         }
 
@@ -52,11 +55,11 @@
             td.find('>.assignedstudyfield')
                 .each(function (idx, elem) {
                     var f = $(elem);
-                    var name = $(f.find('>label')).text().trim();
+                    var name = trimmed($(f.find('>label')).text());
                     fields.push({
                         name: name,
                         value: extractFieldValue(name, f),
-                        fieldId: $(f.find('>div>*:first-child')).attr('id').trim()
+                        fieldId: trimmed($(f.find('>div>*:first-child')).attr('id'))
                     });
                 });
             return fields;
@@ -66,7 +69,7 @@
             var titles = [];
             $('#assignedstudydata-table > thead > tr > th')
                 .each(function (idx, elem) {
-                    titles.push($(this).text().trim());
+                    titles.push(trimmed($(this).text()));
                 });
             return titles;
         })();
@@ -101,7 +104,7 @@
 
         var titleRegex = /(.*)(?:\(\))/;
         var reviewTitle = (function() {
-            var html = $('#main > h2').text().trim();
+            var html = trimmed($('#main > h2').text());
             var titleRegex = /(.*)(?:\(step [0-9]+ and [0-9]+ search(?:es)?\))/;
             var match = titleRegex.exec(html);
             var title = !!match ? match[1].trim() : "";
