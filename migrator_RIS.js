@@ -121,6 +121,22 @@
             lines.push((code || "") + (!!code ? "  - " : "") + (value || ''));
         }
 
+        //function getValueForColumn(citation, columnTitle) {
+        //    var value;
+
+        //    $.each(citation.fields, function (idx, field) {
+        //        var continueIterating = true;
+        //        if (field.column === columnTitle) {
+        //            value = field.value;
+        //            continueIterating = false;
+        //        }
+
+        //        return continueIterating;
+        //    });
+
+        //    return value;
+        //}
+
         function appendRisRecord(citation) {
             var fc = "";
 
@@ -143,11 +159,15 @@
                     case "Notes":
                         appendLine('N1', field.value);
                         break;
+                    case 'Star Study Id':
+                        appendLine('ID', field.value);
+                        break;
                     case "Status":
                         appendLine('C1', field.value);
 
                         // Use this opportunity to write out the id
-                        appendLine('ID', citation.id);
+                        //appendLine('ID', citation.id);
+                        //appendLine('ID', getValueForColumn(citation, 'Star Study Id'));
                         appendLine('U1', citation.id);
                         break;
                     case "Volume":  // THIS IS NOT PART OF THE HTML!!!
