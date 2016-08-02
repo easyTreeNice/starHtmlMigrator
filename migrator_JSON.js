@@ -74,11 +74,38 @@
             return titles;
         })();
 
+        function getColumnFieldValue(rowColumns, columnName, fieldName) {
+            var col, value;
+
+            if (rowColumns) {
+                $.each(rowColumns, function(idx, rc) {
+                    var more = true;
+                    if (rc.column === columnName) {
+                        col = rc;
+                        more = false;
+                    }
+                    return more;
+                });
+                if (!!col) {
+                    $.each(col.fields, function(idx, f) {
+                        var more = true;
+                        if (f.name === fieldName) {
+                            var html = f.value;
+                            value = $(html).text();
+                            more = false;
+                        }
+                        return more;
+                    });
+                }
+            }
+            return value;
+        }
+
         var studies = [];
         $('#assignedstudydata-table > tbody > tr')
             .each(function (idx, elem) {
                 var tr = $(this);
-                var id = tr.attr('id');
+                //var id = tr.attr('id');
                 var tds = tr.find('>td');
 
                 var rowColumns = (function () {
@@ -96,6 +123,8 @@
                     return fields;
                 })();
 
+                var id = getColumnFieldValue(rowColumns, 'Study details', 'Ref Id');
+
                 studies.push({
                     studyId: id,
                     columns: rowColumns
@@ -105,7 +134,7 @@
         var titleRegex = /(.*)(?:\(\))/;
         var reviewTitle = (function() {
             var html = trimmed($('#main > h2').text());
-            var titleRegex = /(.*)(?:\(step [0-9]+ and [0-9]+ search(?:es)?\))/;
+            var titleRegex = /(.*)(?:\(step [0-9]+ and [0-9]+ search(?:es)?\))?/;
             var match = titleRegex.exec(html);
             var title = !!match ? match[1].trim() : "";
             var maxLen = 255;
