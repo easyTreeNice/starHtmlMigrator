@@ -64,12 +64,14 @@ namespace migratorGui
             return path;
         }
 
-        private string GetBootstrapCode()
+        private string GetBootstrapCode(string filePath)
         {
             var exeFolder = Path.GetDirectoryName(Application.ExecutablePath) ?? string.Empty;
             var assetsFolderPath = GetAncestor(exeFolder, Properties.Settings.Default.AssetFolderAncestorGenerations);
             var assetsFolderUri = new Uri(assetsFolderPath).AbsoluteUri;
-            var suffix = ToJSON.Checked ? "JSON" : ToRIS.Checked ? "RIS" : null;
+            //var suffix = ToJSON.Checked ? "JSON" : ToRIS.Checked ? "RIS" : null;
+            var flavour = GetFileFlavour(filePath);
+            var suffix = flavour == Flavour.Json ? "JSON" : flavour == Flavour.Ris ? "RIS" : null;
 
             var bootstrapCode = $"<link href='{assetsFolderUri}/migrator.css' rel='stylesheet' type='text/css'>" +
                                 "<script src = 'http://code.jquery.com/jquery-3.0.0.min.js' " +
@@ -143,10 +145,11 @@ namespace migratorGui
                 .Select(f => f.Replace(prefix, string.Empty))
                 .ToList();
 
-            files.ForEach(f =>
+            InputFilePaths.ForEach(f =>
             {
                 var flavour = GetFileFlavour(f).ToString();
-                fileList.Items.Add($"[{flavour}] {f}");
+                var suffix = f.Replace(prefix, string.Empty);
+                fileList.Items.Add($"[{flavour}] {suffix}");
             });
 
             var nextButtonName = recursive
@@ -186,6 +189,7 @@ namespace migratorGui
 
             var prefix = $"{FolderPath}\\";
             processedFiles.Items.Clear();
+            OutputFilePaths = new List<string>();
             selectedFiles.ForEach(f =>
             {
                 var fileFolderPath = Path.GetDirectoryName(f);
@@ -202,11 +206,10 @@ namespace migratorGui
                 var input = File.ReadAllText(f);
                 var output =
                     reRemoveCssAndScript.Replace(input, string.Empty)
-                        .Replace("<head>", "<head>" + GetBootstrapCode());
+                        .Replace("<head>", "<head>" + GetBootstrapCode(f));
 
                 File.WriteAllText(outputFilePath, output);
 
-                OutputFilePaths = new List<string>();
                 OutputFilePaths.Add(outputFilePath);
 
                 var flavour = GetFileFlavour(f).ToString();
@@ -309,13 +312,13 @@ namespace migratorGui
 
         private void GetUriAndWriteTextAreaContentToFile(string inputFilePath, string textAreaId)
         {
-            System.Diagnostics.Debugger.Launch();
+            //System.Diagnostics.Debugger.Launch();
             var uri = new Uri(inputFilePath).AbsoluteUri;
             _driver.Url = uri;
             _driver.Navigate();
             var output = WaitForElement(textAreaId);
 
-            System.Diagnostics.Debugger.Launch();
+            //System.Diagnostics.Debugger.Launch();
             var json = ((IJavaScriptExecutor)_driver).ExecuteScript("return arguments[0].innerHTML", output).ToString();
             var outputFilePath = MakeOutputFilePath(inputFilePath);
             EnsureFolderPath(outputFilePath);
@@ -334,7 +337,7 @@ namespace migratorGui
             {
                 throw new ArgumentNullException(nameof(inputFilePath));
             }
-            var folder = Path.Combine(Path.GetDirectoryName(inputFilePath), "OutputFiles", "level2");
+            var folder = Path.Combine(Path.GetDirectoryName(inputFilePath), "OutputFiles");
             var fileName = Path.GetFileName(inputFilePath);
             var outputFileName = $"{fileName}.json.txt";
             var outputFilePath = Path.Combine(folder, outputFileName);

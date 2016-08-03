@@ -25,25 +25,32 @@ namespace migratorGui
             wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(InvalidOperationException));
             return wait.Until(ctx =>
             {
-                IWebElement elem = null;
-                try
-                {
-                    elem = ctx.FindElement(by);
-                    if (displayed && !elem.Displayed)
-                    {
-                        elem = null;
-                    }
-                }
-                catch (NoSuchElementException nsee)
-                {
-
-                }
-                catch (InvalidOperationException ioe)
-                {
-
-                }
+                var elem = ctx.FindElement(by);
+                if (displayed && !elem.Displayed)
+                    return null;
                 return elem;
             });
+            //return wait.Until(ctx =>
+            //{
+            //    IWebElement elem = null;
+            //    try
+            //    {
+            //        elem = ctx.FindElement(by);
+            //        if (displayed && !elem.Displayed)
+            //        {
+            //            elem = null;
+            //        }
+            //    }
+            //    catch (NoSuchElementException nsee)
+            //    {
+
+            //    }
+            //    catch (InvalidOperationException ioe)
+            //    {
+
+            //    }
+            //    return elem;
+            //});
         }
     }
 }
