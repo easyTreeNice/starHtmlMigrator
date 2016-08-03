@@ -130,7 +130,9 @@ namespace migratorGui
                 recursive
                     ? SearchOption.AllDirectories
                     : SearchOption.TopDirectoryOnly
-                ).ToList();
+                )
+            .Where(f => !f.Contains(_processedFolderName))
+            .ToList();
 
             if (!InputFilePaths.Any())
             {
@@ -170,6 +172,7 @@ namespace migratorGui
         );
 
         private ChromeDriver _driver;
+        private string _processedFolderName = "ProcessedFiles";
 
         private void processFiles_Click(object sender, EventArgs e)
         {
@@ -195,7 +198,7 @@ namespace migratorGui
                 var fileFolderPath = Path.GetDirectoryName(f);
                 var outputFolderPath = Path.Combine(
                     fileFolderPath,
-                    "Processed",
+                    _processedFolderName,
                     GetNow()
                 );
                 Directory.CreateDirectory(outputFolderPath);
