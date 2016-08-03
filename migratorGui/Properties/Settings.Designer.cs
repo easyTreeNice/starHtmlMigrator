@@ -58,5 +58,29 @@ namespace migratorGui.Properties {
                 this["AssetFolderAncestorGenerations"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RisIdentifierPattern {
+            get {
+                return ((string)(this["RisIdentifierPattern"]));
+            }
+            set {
+                this["RisIdentifierPattern"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string JsonIdentifierPattern {
+            get {
+                return ((string)(this["JsonIdentifierPattern"]));
+            }
+            set {
+                this["JsonIdentifierPattern"] = value;
+            }
+        }
     }
 }

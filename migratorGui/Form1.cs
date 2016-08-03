@@ -27,6 +27,8 @@ namespace migratorGui
             exportFolder.Text = Properties.Settings.Default.RootFolder;
             ToJSON.Checked = !Properties.Settings.Default.ToRIS;
             ToRIS.Checked = Properties.Settings.Default.ToRIS;
+            JsonIdentifierPattern.Text = Properties.Settings.Default.JsonIdentifierPattern;
+            RisIdentifierPattern.Text = Properties.Settings.Default.RisIdentifierPattern;
 
             one = fileList.Left;
             two = findFilesButton.Left - fileList.Right;
@@ -35,13 +37,15 @@ namespace migratorGui
         }
 
         private int _messageCounter;
-        private List<string> FilePaths { get; set; }
+        private List<string> InputFilePaths { get; set; }
+        private List<string> OutputFilePaths { get; set; }
 
         private string FolderPath { get; set; }
 
         void AddMessage(string message)
         {
             messages.Text = $"{++_messageCounter}. {message}{Environment.NewLine}" + messages.Text;
+            Thread.Sleep(10);
         }
 
         void StartSession()
@@ -76,7 +80,35 @@ namespace migratorGui
             return bootstrapCode;
         }
 
+        private enum Flavour
+        {
+            None = 0,
+            Json = 1,
+            Ris = 2
+        }
+
+        private Flavour GetFileFlavour(string filePath)
+        {
+            var flavour = Flavour.None;
+
+            if (filePath.Contains(Properties.Settings.Default.JsonIdentifierPattern))
+            {
+                flavour = Flavour.Json;
+            }
+            else if (filePath.Contains(Properties.Settings.Default.RisIdentifierPattern))
+            {
+                flavour = Flavour.Ris;
+            }
+
+            return flavour;
+        }
+
         private void findFilesButton_Click(object sender, EventArgs e)
+        {
+            DoFindFiles(recursive: false);
+        }
+
+        private void DoFindFiles(bool recursive, bool usePatterns = false)
         {
             Properties.Settings.Default.RootFolder = exportFolder.Text.Trim();
             Properties.Settings.Default.Save();
@@ -89,23 +121,39 @@ namespace migratorGui
                 AddMessage("Folder doesn't exist. Aborting.");
                 return;
             }
-            FilePaths = Directory.GetFiles(FolderPath)
-                .Where(f => f.ToLower().EndsWith(".html"))
-                .ToList();
-            if (!FilePaths.Any())
+
+            InputFilePaths = Directory.GetFiles(
+                FolderPath,
+                "*.html",
+                recursive
+                    ? SearchOption.AllDirectories
+                    : SearchOption.TopDirectoryOnly
+                ).ToList();
+
+            if (!InputFilePaths.Any())
             {
                 AddMessage($"No html files found at \"{FolderPath}\". Aborting.");
                 return;
             }
             processFilesButton.Enabled = true;
 
-            var files = FilePaths
-                .Select(Path.GetFileName)
-                .ToList();
-            
-            files.ForEach(f => fileList.Items.Add(f));
+            var prefix = $"{FolderPath}\\";
 
-            AddMessage($"Files found. Please press the 'Add Bootstrap' button.");
+            var files = InputFilePaths
+                .Select(f => f.Replace(prefix, string.Empty))
+                .ToList();
+
+            files.ForEach(f =>
+            {
+                var flavour = GetFileFlavour(f).ToString();
+                fileList.Items.Add($"[{flavour}] {f}");
+            });
+
+            var nextButtonName = recursive
+                ? runAutomatedButton.Text
+                : processFilesButton.Text;
+
+            AddMessage($"Files found. Please press the '{nextButtonName}' button.");
         }
 
         string GetNow()
@@ -122,41 +170,55 @@ namespace migratorGui
 
         private void processFiles_Click(object sender, EventArgs e)
         {
+            DoAddBootstrap();
+        }
+
+        private void DoAddBootstrap()
+        {
             Properties.Settings.Default.ToRIS = ToRIS.Checked;
             Properties.Settings.Default.Save();
 
             var selectedFiles = fileList.SelectedIndices.Cast<int>()
-                .Select(i => FilePaths[i])
+                .Select(i => InputFilePaths[i])
                 .ToList();
 
-            selectedFiles = FilePaths;
+            selectedFiles = InputFilePaths;
 
-            var outputFolderPath = Path.Combine(
-                FolderPath, 
-                GetNow()
-            );
             var prefix = $"{FolderPath}\\";
             processedFiles.Items.Clear();
-            Directory.CreateDirectory(outputFolderPath);
             selectedFiles.ForEach(f =>
             {
+                var fileFolderPath = Path.GetDirectoryName(f);
+                var outputFolderPath = Path.Combine(
+                    fileFolderPath,
+                    "Processed",
+                    GetNow()
+                );
+                Directory.CreateDirectory(outputFolderPath);
                 var outputFilePath = Path.Combine(
                     outputFolderPath,
                     Path.GetFileName(f)
-                );
+                    );
                 var input = File.ReadAllText(f);
                 var output =
                     reRemoveCssAndScript.Replace(input, string.Empty)
-                    .Replace("<head>", "<head>" + GetBootstrapCode());
+                        .Replace("<head>", "<head>" + GetBootstrapCode());
 
                 File.WriteAllText(outputFilePath, output);
 
-                processedFiles.Items.Add(outputFilePath.Replace(prefix, string.Empty));
-            });
-            var relPath = outputFolderPath.Replace(prefix, string.Empty);
-            AddMessage($"Modified files written to newly-created sub-folder: \"{relPath}\". Please open them in your browser.");
+                OutputFilePaths = new List<string>();
+                OutputFilePaths.Add(outputFilePath);
 
-            Process.Start(outputFolderPath);
+                var flavour = GetFileFlavour(f).ToString();
+                var relative = outputFilePath.Replace(prefix, string.Empty);
+                var listEntry = $"[{flavour}] {relative}";
+
+                processedFiles.Items.Add(listEntry);
+            });
+            //var relPath = outputFolderPath.Replace(prefix, string.Empty);
+            //AddMessage($"Modified files written to newly-created sub-folder: \"{relPath}\". Please open them in your browser.");
+
+            //Process.Start(outputFolderPath);
         }
 
         private void Form1_SizeChanged(object sender, EventArgs e)
@@ -175,10 +237,13 @@ namespace migratorGui
             {
                 findFilesButton,
                 processFilesButton,
-                processedFiles
+                processedFiles,
+                groupBox1,
+                groupBox2
             }.ForEach(c => c.Left += deltaA);
 
             fileList.Width += deltaA;
+            exportFolder.Width += deltaA;
             processedFiles.Width += deltaB;
         }
 
@@ -190,12 +255,6 @@ namespace migratorGui
 
         private void runAutomatedButton_Click(object sender, EventArgs e)
         {
-            //var searchBox = driver.FindElementByName("q");
-            //searchBox.SendKeys("ChromeDriver");
-            //searchBox.Submit();
-            //Thread.Sleep(10000);  // Let the user actually see something!
-            //driver.Quit();
-
             var options = new ChromeOptions();
             var service = ChromeDriverService.CreateDefaultService();
             try
@@ -204,16 +263,37 @@ namespace migratorGui
 
                 _driver = new ChromeDriver(service, options);
 
-                //var filePath = @"N:\dev\starHtmlMigrator\LocalOnly\For JSON extraction\Eds_Test_files\2016.07.26-15.30.27\1000065.html";
-                //GetJsonAndStoreInOutputFile(filePath);
-
-                var filePath = @"N:\dev\starHtmlMigrator\LocalOnly\For RIS extraction\2016.08.02-12.23.15\simpyNamed.html";
-                GetRisAndStoreInOutputFile(filePath);
+                OutputFilePaths.ForEach(AutoProcessFile);
             }
             finally
             {
                 _driver.Quit();
                 service.Dispose();
+            }
+        }
+
+        private void AutoProcessFile(string filePath)
+        {
+            switch (GetFileFlavour(filePath))
+            {
+                case Flavour.Json:
+                    //var filePath = @"N:\dev\starHtmlMigrator\LocalOnly\For JSON extraction\Eds_Test_files\2016.07.26-15.30.27\1000065.html";
+                    AddMessage($"[Start]  [JSON] Processing file '{filePath}'");
+                    GetJsonAndStoreInOutputFile(filePath);
+                    AddMessage($"[Finish] [JSON] Processing file '{filePath}'");
+                    break;
+                case Flavour.Ris:
+                    // var filePath = @"N:\dev\starHtmlMigrator\LocalOnly\For RIS extraction\2016.08.02-12.23.15\simpyNamed.html";
+                    AddMessage($"[Start]  [RIS]  Processing file '{filePath}'");
+                    GetRisAndStoreInOutputFile(filePath);
+                    AddMessage($"[Finish] [RIS]  Processing file '{filePath}'");
+                    break;
+                case Flavour.None:
+                    AddMessage($"File neither JSON nor RIS: '{filePath}'.");
+                    //throw new Exception(
+                    //    $"All files should be detected as either JSON or RIS. This file has been detected as neither: '{filePath}' "
+                    //);
+                    break;
             }
         }
 
@@ -229,13 +309,13 @@ namespace migratorGui
 
         private void GetUriAndWriteTextAreaContentToFile(string inputFilePath, string textAreaId)
         {
+            System.Diagnostics.Debugger.Launch();
             var uri = new Uri(inputFilePath).AbsoluteUri;
             _driver.Url = uri;
             _driver.Navigate();
-            //var output = _driver.FindElementById(textAreaId);
             var output = WaitForElement(textAreaId);
-            //var json = output.Text;
-            //var json = output.Text;
+
+            System.Diagnostics.Debugger.Launch();
             var json = ((IJavaScriptExecutor)_driver).ExecuteScript("return arguments[0].innerHTML", output).ToString();
             var outputFilePath = MakeOutputFilePath(inputFilePath);
             EnsureFolderPath(outputFilePath);
@@ -266,6 +346,16 @@ namespace migratorGui
         {
             var folder = Path.GetDirectoryName(filePath);
             Directory.CreateDirectory(folder);
+        }
+
+        private void findFilesInFolderTree_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.JsonIdentifierPattern = JsonIdentifierPattern.Text.Trim();
+            Properties.Settings.Default.RisIdentifierPattern = RisIdentifierPattern.Text.Trim();
+            Properties.Settings.Default.Save();
+
+            DoFindFiles(recursive: true, usePatterns: true);
+            DoAddBootstrap();
         }
     }
 }
