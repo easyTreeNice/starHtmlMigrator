@@ -23,11 +23,25 @@ namespace migratorGui
             var wait = new DefaultWait<ISearchContext>(context);
             wait.Timeout = TimeSpan.FromSeconds(timeout);
             wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(InvalidOperationException));
-            return wait.Until(ctx => {
-                var elem = ctx.FindElement(by);
-                if (displayed && !elem.Displayed)
-                    return null;
+            return wait.Until(ctx =>
+            {
+                IWebElement elem = null;
+                try
+                {
+                    elem = ctx.FindElement(by);
+                    if (displayed && !elem.Displayed)
+                    {
+                        elem = null;
+                    }
+                }
+                catch (NoSuchElementException nsee)
+                {
 
+                }
+                catch (InvalidOperationException ioe)
+                {
+
+                }
                 return elem;
             });
         }

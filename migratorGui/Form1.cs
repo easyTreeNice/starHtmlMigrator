@@ -325,7 +325,7 @@ namespace migratorGui
 
         private IWebElement WaitForElement(string elementId)
         {
-            return _driver.WaitForElement(By.Id(elementId), uint.MaxValue, true);
+            return _driver.WaitForElement(By.Id(elementId), uint.MaxValue, false);
         }
 
         private static string MakeOutputFilePath(string inputFilePath)

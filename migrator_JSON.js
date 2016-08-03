@@ -247,7 +247,8 @@
         if (demo >= 2) displayAsJSON(data);
     }
 
-    $(function() {
+    $(function () {
+        $('body').prepend('<div>migrator_JSON.js loaded at !' + Date() + "</div>");
         go();
     });
 }) ();

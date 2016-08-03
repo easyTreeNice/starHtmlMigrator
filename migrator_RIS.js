@@ -272,6 +272,7 @@
     }
 
     $(function() {
+        $('body').prepend('<div>migrator_RIS.js loaded at !' + Date() + "</div>");
         go();
     });
 }) ();
