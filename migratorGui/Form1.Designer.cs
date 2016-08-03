@@ -36,8 +36,9 @@
             this.processedFiles = new System.Windows.Forms.ListBox();
             this.messages = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.ToJSON = new System.Windows.Forms.RadioButton();
             this.ToRIS = new System.Windows.Forms.RadioButton();
+            this.ToJSON = new System.Windows.Forms.RadioButton();
+            this.runAutomatedButton = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -116,6 +117,16 @@
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             // 
+            // ToRIS
+            // 
+            this.ToRIS.AutoSize = true;
+            this.ToRIS.Location = new System.Drawing.Point(7, 43);
+            this.ToRIS.Name = "ToRIS";
+            this.ToRIS.Size = new System.Drawing.Size(77, 17);
+            this.ToRIS.TabIndex = 0;
+            this.ToRIS.Text = "Create RIS";
+            this.ToRIS.UseVisualStyleBackColor = true;
+            // 
             // ToJSON
             // 
             this.ToJSON.AutoSize = true;
@@ -128,21 +139,22 @@
             this.ToJSON.Text = "Create JSON";
             this.ToJSON.UseVisualStyleBackColor = true;
             // 
-            // ToRIS
+            // runAutomatedButton
             // 
-            this.ToRIS.AutoSize = true;
-            this.ToRIS.Location = new System.Drawing.Point(7, 43);
-            this.ToRIS.Name = "ToRIS";
-            this.ToRIS.Size = new System.Drawing.Size(77, 17);
-            this.ToRIS.TabIndex = 0;
-            this.ToRIS.Text = "Create RIS";
-            this.ToRIS.UseVisualStyleBackColor = true;
+            this.runAutomatedButton.Location = new System.Drawing.Point(305, 170);
+            this.runAutomatedButton.Name = "runAutomatedButton";
+            this.runAutomatedButton.Size = new System.Drawing.Size(117, 23);
+            this.runAutomatedButton.TabIndex = 8;
+            this.runAutomatedButton.Text = "Run Automated >>";
+            this.runAutomatedButton.UseVisualStyleBackColor = true;
+            this.runAutomatedButton.Click += new System.EventHandler(this.runAutomatedButton_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(726, 362);
+            this.Controls.Add(this.runAutomatedButton);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.messages);
             this.Controls.Add(this.processedFiles);
@@ -175,6 +187,7 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton ToRIS;
         private System.Windows.Forms.RadioButton ToJSON;
+        private System.Windows.Forms.Button runAutomatedButton;
     }
 }
 

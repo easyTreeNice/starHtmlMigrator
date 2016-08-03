@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Remote;
 
 namespace migratorGui
 {
@@ -118,6 +117,9 @@ namespace migratorGui
         static Regex reRemoveCssAndScript = new Regex(
             "(?ims)(?<script>\\<script.+?\\<\\/script\\>)|(?<style>\\<link.+?type=\\\"text/css\"[^>]*\\>)"
         );
+
+        private ChromeDriver _driver;
+
         private void processFiles_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.ToRIS = ToRIS.Checked;
@@ -184,6 +186,86 @@ namespace migratorGui
         {
             processFilesButton.Enabled = false;
             FolderPath = exportFolder.Text.Trim();
+        }
+
+        private void runAutomatedButton_Click(object sender, EventArgs e)
+        {
+            //var searchBox = driver.FindElementByName("q");
+            //searchBox.SendKeys("ChromeDriver");
+            //searchBox.Submit();
+            //Thread.Sleep(10000);  // Let the user actually see something!
+            //driver.Quit();
+
+            var options = new ChromeOptions();
+            var service = ChromeDriverService.CreateDefaultService();
+            try
+            {
+                service.Start();
+
+                _driver = new ChromeDriver(service, options);
+
+                //var filePath = @"N:\dev\starHtmlMigrator\LocalOnly\For JSON extraction\Eds_Test_files\2016.07.26-15.30.27\1000065.html";
+                //GetJsonAndStoreInOutputFile(filePath);
+
+                var filePath = @"N:\dev\starHtmlMigrator\LocalOnly\For RIS extraction\2016.08.02-12.23.15\simpyNamed.html";
+                GetRisAndStoreInOutputFile(filePath);
+            }
+            finally
+            {
+                _driver.Quit();
+                service.Dispose();
+            }
+        }
+
+        private void GetRisAndStoreInOutputFile(string filePath)
+        {
+            GetUriAndWriteTextAreaContentToFile(filePath, "risOutput");
+        }
+
+        private void GetJsonAndStoreInOutputFile(string filePath)
+        {
+            GetUriAndWriteTextAreaContentToFile(filePath, "output");
+        }
+
+        private void GetUriAndWriteTextAreaContentToFile(string inputFilePath, string textAreaId)
+        {
+            var uri = new Uri(inputFilePath).AbsoluteUri;
+            _driver.Url = uri;
+            _driver.Navigate();
+            //var output = _driver.FindElementById(textAreaId);
+            var output = WaitForElement(textAreaId);
+            //var json = output.Text;
+            //var json = output.Text;
+            var json = ((IJavaScriptExecutor)_driver).ExecuteScript("return arguments[0].innerHTML", output).ToString();
+            var outputFilePath = MakeOutputFilePath(inputFilePath);
+            EnsureFolderPath(outputFilePath);
+
+            File.WriteAllText(outputFilePath, json);
+        }
+
+        private IWebElement WaitForElement(string elementId)
+        {
+            return _driver.WaitForElement(By.Id(elementId), uint.MaxValue, true);
+        }
+
+        private static string MakeOutputFilePath(string inputFilePath)
+        {
+            if (string.IsNullOrEmpty(inputFilePath))
+            {
+                throw new ArgumentNullException(nameof(inputFilePath));
+            }
+            var folder = Path.Combine(Path.GetDirectoryName(inputFilePath), "OutputFiles", "level2");
+            var fileName = Path.GetFileName(inputFilePath);
+            var outputFileName = $"{fileName}.json.txt";
+            var outputFilePath = Path.Combine(folder, outputFileName);
+
+            return outputFilePath;
+        }
+
+        private static void EnsureFolderPath(string filePath)
+        {
+            var folder = Path.GetDirectoryName(filePath);
+            Directory.CreateDirectory(folder);
         }
     }
 }
