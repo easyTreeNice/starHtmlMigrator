@@ -34,17 +34,17 @@
             this.processedFiles = new System.Windows.Forms.ListBox();
             this.messages = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.findFilesButton = new System.Windows.Forms.Button();
+            this.processFilesButton = new System.Windows.Forms.Button();
             this.ToRIS = new System.Windows.Forms.RadioButton();
             this.ToJSON = new System.Windows.Forms.RadioButton();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.JsonIdentifierPattern = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.findFilesInFolderTree = new System.Windows.Forms.Button();
             this.RisIdentifierPattern = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.runAutomatedButton = new System.Windows.Forms.Button();
-            this.processFilesButton = new System.Windows.Forms.Button();
-            this.findFilesButton = new System.Windows.Forms.Button();
-            this.findFilesInFolderTree = new System.Windows.Forms.Button();
+            this.JsonIdentifierPattern = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -90,6 +90,7 @@
             this.messages.Location = new System.Drawing.Point(13, 353);
             this.messages.Multiline = true;
             this.messages.Name = "messages";
+            this.messages.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.messages.Size = new System.Drawing.Size(698, 100);
             this.messages.TabIndex = 6;
             // 
@@ -105,6 +106,27 @@
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "OLd";
+            // 
+            // findFilesButton
+            // 
+            this.findFilesButton.Location = new System.Drawing.Point(9, 19);
+            this.findFilesButton.Name = "findFilesButton";
+            this.findFilesButton.Size = new System.Drawing.Size(115, 23);
+            this.findFilesButton.TabIndex = 6;
+            this.findFilesButton.Text = "Find files in folder";
+            this.findFilesButton.UseVisualStyleBackColor = true;
+            this.findFilesButton.Click += new System.EventHandler(this.findFilesButton_Click);
+            // 
+            // processFilesButton
+            // 
+            this.processFilesButton.Enabled = false;
+            this.processFilesButton.Location = new System.Drawing.Point(9, 94);
+            this.processFilesButton.Name = "processFilesButton";
+            this.processFilesButton.Size = new System.Drawing.Size(115, 23);
+            this.processFilesButton.TabIndex = 5;
+            this.processFilesButton.Text = "Add Bootstrap >>";
+            this.processFilesButton.UseVisualStyleBackColor = true;
+            this.processFilesButton.Click += new System.EventHandler(this.processFiles_Click);
             // 
             // ToRIS
             // 
@@ -143,21 +165,15 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "New";
             // 
-            // JsonIdentifierPattern
+            // findFilesInFolderTree
             // 
-            this.JsonIdentifierPattern.Location = new System.Drawing.Point(11, 32);
-            this.JsonIdentifierPattern.Name = "JsonIdentifierPattern";
-            this.JsonIdentifierPattern.Size = new System.Drawing.Size(115, 20);
-            this.JsonIdentifierPattern.TabIndex = 12;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(8, 16);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(113, 13);
-            this.label2.TabIndex = 11;
-            this.label2.Text = "JSON identifier pattern";
+            this.findFilesInFolderTree.Location = new System.Drawing.Point(11, 105);
+            this.findFilesInFolderTree.Name = "findFilesInFolderTree";
+            this.findFilesInFolderTree.Size = new System.Drawing.Size(115, 23);
+            this.findFilesInFolderTree.TabIndex = 16;
+            this.findFilesInFolderTree.Text = "Find files in folder tree";
+            this.findFilesInFolderTree.UseVisualStyleBackColor = true;
+            this.findFilesInFolderTree.Click += new System.EventHandler(this.findFilesInFolderTree_Click);
             // 
             // RisIdentifierPattern
             // 
@@ -185,36 +201,21 @@
             this.runAutomatedButton.UseVisualStyleBackColor = true;
             this.runAutomatedButton.Click += new System.EventHandler(this.runAutomatedButton_Click);
             // 
-            // processFilesButton
+            // JsonIdentifierPattern
             // 
-            this.processFilesButton.Enabled = false;
-            this.processFilesButton.Location = new System.Drawing.Point(9, 94);
-            this.processFilesButton.Name = "processFilesButton";
-            this.processFilesButton.Size = new System.Drawing.Size(115, 23);
-            this.processFilesButton.TabIndex = 5;
-            this.processFilesButton.Text = "Add Bootstrap >>";
-            this.processFilesButton.UseVisualStyleBackColor = true;
-            this.processFilesButton.Click += new System.EventHandler(this.processFiles_Click);
+            this.JsonIdentifierPattern.Location = new System.Drawing.Point(11, 32);
+            this.JsonIdentifierPattern.Name = "JsonIdentifierPattern";
+            this.JsonIdentifierPattern.Size = new System.Drawing.Size(115, 20);
+            this.JsonIdentifierPattern.TabIndex = 12;
             // 
-            // findFilesButton
+            // label2
             // 
-            this.findFilesButton.Location = new System.Drawing.Point(9, 19);
-            this.findFilesButton.Name = "findFilesButton";
-            this.findFilesButton.Size = new System.Drawing.Size(115, 23);
-            this.findFilesButton.TabIndex = 6;
-            this.findFilesButton.Text = "Find files in folder";
-            this.findFilesButton.UseVisualStyleBackColor = true;
-            this.findFilesButton.Click += new System.EventHandler(this.findFilesButton_Click);
-            // 
-            // findFilesInFolderTree
-            // 
-            this.findFilesInFolderTree.Location = new System.Drawing.Point(11, 105);
-            this.findFilesInFolderTree.Name = "findFilesInFolderTree";
-            this.findFilesInFolderTree.Size = new System.Drawing.Size(115, 23);
-            this.findFilesInFolderTree.TabIndex = 16;
-            this.findFilesInFolderTree.Text = "Find files in folder tree";
-            this.findFilesInFolderTree.UseVisualStyleBackColor = true;
-            this.findFilesInFolderTree.Click += new System.EventHandler(this.findFilesInFolderTree_Click);
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(8, 16);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(113, 13);
+            this.label2.TabIndex = 11;
+            this.label2.Text = "JSON identifier pattern";
             // 
             // Form1
             // 

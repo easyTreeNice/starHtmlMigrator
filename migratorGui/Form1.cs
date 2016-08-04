@@ -19,6 +19,8 @@ namespace migratorGui
         int three;
         int four;
 
+        private string FileNameNow { get; set; }
+
         public Form1()
         {
             InitializeComponent();
@@ -50,7 +52,8 @@ namespace migratorGui
 
         void StartSession()
         {
-            AddMessage($"Starting session at {GetNow()}");
+            FileNameNow = GetNow();
+            AddMessage($"Starting session at {FileNameNow}");
         }
 
         private string GetAncestor(string originalFolder, int generations)
@@ -89,7 +92,7 @@ namespace migratorGui
             Ris = 2
         }
 
-        private Flavour GetFileFlavour(string filePath)
+        private static Flavour GetFileFlavour(string filePath)
         {
             var flavour = Flavour.None;
 
@@ -171,8 +174,10 @@ namespace migratorGui
             "(?ims)(?<script>\\<script.+?\\<\\/script\\>)|(?<style>\\<link.+?type=\\\"text/css\"[^>]*\\>)"
         );
 
-        private ChromeDriver _driver;
+        //private ChromeDriver _driver;
         private string _processedFolderName = "ProcessedFiles";
+        private ChromeDriverService _service;
+        private ChromeOptions _driverOptions;
 
         private void processFiles_Click(object sender, EventArgs e)
         {
@@ -199,7 +204,7 @@ namespace migratorGui
                 var outputFolderPath = Path.Combine(
                     fileFolderPath,
                     _processedFolderName,
-                    GetNow()
+                    FileNameNow
                 );
                 Directory.CreateDirectory(outputFolderPath);
                 var outputFilePath = Path.Combine(
@@ -259,79 +264,109 @@ namespace migratorGui
             FolderPath = exportFolder.Text.Trim();
         }
 
+        private string GetLogFilePath()
+        {
+            //var exePath = AppDomain.CurrentDomain.BaseDirectory;
+            var logFolderPath = Path.Combine(FolderPath, "Logs");
+            Directory.CreateDirectory(logFolderPath);
+            var logFilePath = Path.Combine(logFolderPath, "LogFile.txt");
+            return logFilePath;
+        }
+
         private void runAutomatedButton_Click(object sender, EventArgs e)
         {
-            var options = new ChromeOptions();
-            var service = ChromeDriverService.CreateDefaultService();
+            _driverOptions = new ChromeOptions();
+            //options.AddArgument("start-maximized");
+            _service = ChromeDriverService.CreateDefaultService();
+            _service.LogPath = GetLogFilePath();
+            AddMessage($"LogFilePath set to {_service.LogPath}");
+            _service.EnableVerboseLogging = true;
+
             try
             {
-                service.Start();
-
-                _driver = new ChromeDriver(service, options);
+                _service.Start();
 
                 OutputFilePaths.ForEach(AutoProcessFile);
+            }                  
+            catch (Exception ex)
+            {
+                AddMessage($"Exception: {ex.Message}");
             }
             finally
             {
-                _driver.Quit();
-                service.Dispose();
+                _service.Dispose();
+            }
+        }
+
+        private void DoAutoProcessFile(ChromeDriver driver, string filePath)
+        {
+            switch (GetFileFlavour(filePath))
+            {
+                case Flavour.Json:
+                    AddMessage($"[Start]  [JSON] Processing file '{filePath}'");
+                    GetJsonAndStoreInOutputFile(driver, filePath);
+                    AddMessage($"[Finish] [JSON] Processing file '{filePath}'");
+                    break;
+                case Flavour.Ris:
+                    AddMessage($"[Start]  [RIS]  Processing file '{filePath}'");
+                    GetRisAndStoreInOutputFile(driver, filePath);
+                    AddMessage($"[Finish] [RIS]  Processing file '{filePath}'");
+                    break;
+                case Flavour.None:
+                    AddMessage($"File neither JSON nor RIS: '{filePath}'.");
+                    break;
             }
         }
 
         private void AutoProcessFile(string filePath)
         {
-            switch (GetFileFlavour(filePath))
+            ChromeDriver driver = null;
+            try {
+                driver = new ChromeDriver(_service, _driverOptions);
+                driver.Manage().Timeouts().SetPageLoadTimeout(TimeSpan.MaxValue);
+
+                DoAutoProcessFile (driver, filePath);
+            }
+            catch (Exception ex)
             {
-                case Flavour.Json:
-                    //var filePath = @"N:\dev\starHtmlMigrator\LocalOnly\For JSON extraction\Eds_Test_files\2016.07.26-15.30.27\1000065.html";
-                    AddMessage($"[Start]  [JSON] Processing file '{filePath}'");
-                    GetJsonAndStoreInOutputFile(filePath);
-                    AddMessage($"[Finish] [JSON] Processing file '{filePath}'");
-                    break;
-                case Flavour.Ris:
-                    // var filePath = @"N:\dev\starHtmlMigrator\LocalOnly\For RIS extraction\2016.08.02-12.23.15\simpyNamed.html";
-                    AddMessage($"[Start]  [RIS]  Processing file '{filePath}'");
-                    GetRisAndStoreInOutputFile(filePath);
-                    AddMessage($"[Finish] [RIS]  Processing file '{filePath}'");
-                    break;
-                case Flavour.None:
-                    AddMessage($"File neither JSON nor RIS: '{filePath}'.");
-                    //throw new Exception(
-                    //    $"All files should be detected as either JSON or RIS. This file has been detected as neither: '{filePath}' "
-                    //);
-                    break;
+                AddMessage($"Exception: {ex.Message}");
+            }
+            finally
+            {
+                driver.Dispose();
+                driver.Quit();
             }
         }
 
-        private void GetRisAndStoreInOutputFile(string filePath)
+        private void GetRisAndStoreInOutputFile(ChromeDriver driver, string filePath)
         {
-            GetUriAndWriteTextAreaContentToFile(filePath, "risOutput");
+            GetUriAndWriteTextAreaContentToFile(driver, filePath, "risOutput");
         }
 
-        private void GetJsonAndStoreInOutputFile(string filePath)
+        private void GetJsonAndStoreInOutputFile(ChromeDriver driver, string filePath)
         {
-            GetUriAndWriteTextAreaContentToFile(filePath, "output");
+            GetUriAndWriteTextAreaContentToFile(driver, filePath, "output");
         }
 
-        private void GetUriAndWriteTextAreaContentToFile(string inputFilePath, string textAreaId)
+        private void GetUriAndWriteTextAreaContentToFile(ChromeDriver driver, string inputFilePath, string textAreaId)
         {
             //System.Diagnostics.Debugger.Launch();
             var uri = new Uri(inputFilePath).AbsoluteUri;
-            _driver.Url = uri;
-            _driver.Navigate();
-            var output = WaitForElement(textAreaId);
+            driver.Url = uri;
+            driver.Navigate();
+            var output = WaitForElement(driver, textAreaId);
 
             //System.Diagnostics.Debugger.Launch();
-            var json = ((IJavaScriptExecutor)_driver).ExecuteScript("return arguments[0].innerHTML", output).ToString();
+            var json = ((IJavaScriptExecutor)driver).ExecuteScript("return arguments[0].innerHTML", output).ToString();
             var outputFilePath = MakeOutputFilePath(inputFilePath);
             EnsureFolderPath(outputFilePath);
 
             File.WriteAllText(outputFilePath, json);
         }
 
-        private IWebElement WaitForElement(string elementId)
+        private IWebElement WaitForElement(ChromeDriver driver, string elementId)
         {
-            return _driver.WaitForElement(By.Id(elementId), uint.MaxValue, false);
+            return driver.WaitForElement(By.Id(elementId), uint.MaxValue, false);
         }
 
         private static string MakeOutputFilePath(string inputFilePath)
@@ -342,7 +377,14 @@ namespace migratorGui
             }
             var folder = Path.Combine(Path.GetDirectoryName(inputFilePath), "OutputFiles");
             var fileName = Path.GetFileName(inputFilePath);
-            var outputFileName = $"{fileName}.json.txt";
+            var flavour = GetFileFlavour(inputFilePath);
+            var flavourSuffix = flavour == Flavour.Json
+                ? "json"
+                : flavour == Flavour.Ris
+                    ? "ris"
+                    : "error";
+
+            var outputFileName = $"{fileName}.{flavourSuffix}.txt";
             var outputFilePath = Path.Combine(folder, outputFileName);
 
             return outputFilePath;
