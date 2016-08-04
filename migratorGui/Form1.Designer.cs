@@ -200,6 +200,7 @@
             // 
             // testButton
             // 
+            this.testButton.Enabled = false;
             this.testButton.Location = new System.Drawing.Point(11, 160);
             this.testButton.Name = "testButton";
             this.testButton.Size = new System.Drawing.Size(115, 23);
