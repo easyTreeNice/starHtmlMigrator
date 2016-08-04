@@ -8,7 +8,9 @@ using System.Threading;
 using System.Windows.Forms;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Remote;
+using OpenQA.Selenium.Support.UI;
 
 namespace migratorGui
 {
@@ -52,6 +54,10 @@ namespace migratorGui
 
         void StartSession()
         {
+            fileList.Items.Clear();
+            processedFiles.Items.Clear();
+            messages.Text = string.Empty;
+
             FileNameNow = GetNow();
             AddMessage($"Starting session at {FileNameNow}");
         }
@@ -67,14 +73,15 @@ namespace migratorGui
             return path;
         }
 
-        private string GetBootstrapCode(string filePath)
+        private string GetBootstrapCode(string filePath, bool newMethod)
         {
             var exeFolder = Path.GetDirectoryName(Application.ExecutablePath) ?? string.Empty;
             var assetsFolderPath = GetAncestor(exeFolder, Properties.Settings.Default.AssetFolderAncestorGenerations);
             var assetsFolderUri = new Uri(assetsFolderPath).AbsoluteUri;
-            //var suffix = ToJSON.Checked ? "JSON" : ToRIS.Checked ? "RIS" : null;
             var flavour = GetFileFlavour(filePath);
-            var suffix = flavour == Flavour.Json ? "JSON" : flavour == Flavour.Ris ? "RIS" : null;
+            var suffix = newMethod 
+                            ? (flavour == Flavour.Json ? "JSON" : flavour == Flavour.Ris ? "RIS" : null)
+                            : (ToJSON.Checked ? "JSON" : ToRIS.Checked ? "RIS" : null);
 
             var bootstrapCode = $"<link href='{assetsFolderUri}/migrator.css' rel='stylesheet' type='text/css'>" +
                                 "<script src = 'http://code.jquery.com/jquery-3.0.0.min.js' " +
@@ -106,11 +113,6 @@ namespace migratorGui
             }
 
             return flavour;
-        }
-
-        private void findFilesButton_Click(object sender, EventArgs e)
-        {
-            DoFindFiles(recursive: false);
         }
 
         private void DoFindFiles(bool recursive, bool usePatterns = false)
@@ -174,17 +176,15 @@ namespace migratorGui
             "(?ims)(?<script>\\<script.+?\\<\\/script\\>)|(?<style>\\<link.+?type=\\\"text/css\"[^>]*\\>)"
         );
 
-        //private ChromeDriver _driver;
+        //private IWebDriver _driver;
         private string _processedFolderName = "ProcessedFiles";
-        private ChromeDriverService _service;
-        private ChromeOptions _driverOptions;
+        private DriverService _service;
 
         private void processFiles_Click(object sender, EventArgs e)
         {
-            DoAddBootstrap();
         }
 
-        private void DoAddBootstrap()
+        private void DoAddBootstrap(bool newMethod)
         {
             Properties.Settings.Default.ToRIS = ToRIS.Checked;
             Properties.Settings.Default.Save();
@@ -214,7 +214,7 @@ namespace migratorGui
                 var input = File.ReadAllText(f);
                 var output =
                     reRemoveCssAndScript.Replace(input, string.Empty)
-                        .Replace("<head>", "<head>" + GetBootstrapCode(f));
+                        .Replace("<head>", "<head>" + GetBootstrapCode(f, newMethod));
 
                 File.WriteAllText(outputFilePath, output);
 
@@ -246,8 +246,8 @@ namespace migratorGui
 
             new Control[]
             {
-                findFilesButton,
-                processFilesButton,
+                //findFilesButton,
+                //processFilesButton,
                 processedFiles,
                 groupBox1,
                 groupBox2
@@ -275,18 +275,19 @@ namespace migratorGui
 
         private void runAutomatedButton_Click(object sender, EventArgs e)
         {
-            _driverOptions = new ChromeOptions();
-            //options.AddArgument("start-maximized");
             _service = ChromeDriverService.CreateDefaultService();
-            _service.LogPath = GetLogFilePath();
-            AddMessage($"LogFilePath set to {_service.LogPath}");
-            _service.EnableVerboseLogging = true;
+            //_service.LogPath = GetLogFilePath();
+
+            //AddMessage($"LogFilePath set to {_service.LogPath}");
+            //_service.EnableVerboseLogging = true;
+            IWebDriver driver = null;
 
             try
             {
-                _service.Start();
+                //_service.Start();
+                driver = CreateDriver();
 
-                OutputFilePaths.ForEach(AutoProcessFile);
+                OutputFilePaths.ForEach(f => AutoProcessFile(driver, f));
             }                  
             catch (Exception ex)
             {
@@ -294,11 +295,16 @@ namespace migratorGui
             }
             finally
             {
-                _service.Dispose();
+                if (driver != null)
+                {
+                    driver.Quit();
+                    driver.Dispose();
+                }
+                //_service.Dispose();
             }
         }
 
-        private void DoAutoProcessFile(ChromeDriver driver, string filePath)
+        private void DoAutoProcessFile(IWebDriver driver, string filePath)
         {
             switch (GetFileFlavour(filePath))
             {
@@ -318,42 +324,59 @@ namespace migratorGui
             }
         }
 
-        private void AutoProcessFile(string filePath)
+        private IWebDriver CreateDriver()
         {
-            ChromeDriver driver = null;
-            try {
-                driver = new ChromeDriver(_service, _driverOptions);
-                driver.Manage().Timeouts().SetPageLoadTimeout(TimeSpan.MaxValue);
+            var driverOptions = new ChromeOptions();
+            driverOptions.SetLoggingPreference(LogType.Driver, 0);
+            driverOptions.SetLoggingPreference(LogType.Browser, 0);
+            //driverOptions.SetLoggingPreference(LogType.Client, 0);
+            //driverOptions.SetLoggingPreference(LogType.Profiler, 0);
+            //driverOptions.SetLoggingPreference(LogType.Server, 0);
+            driverOptions.AddArgument("--log-level=0");
+            driverOptions.AddArgument("--verbose");
+            var logPath = GetLogFilePath();
+            driverOptions.AddArgument($"--log-path={logPath}");
+            driverOptions.AddArgument("--disable-extensions");
+            AddMessage($"LogFilePath set to {logPath}");
+            var driver = new ChromeDriver(_service as ChromeDriverService, driverOptions, Timeout.InfiniteTimeSpan);
 
+            //var driver = new RemoteWebDriver(new Uri("http://localhost:9515"), DesiredCapabilities.Chrome());    
+            //driver.Manage().Timeouts().SetPageLoadTimeout(TimeSpan.MaxValue);
+            //driver.Manage().Timeouts().SetScriptTimeout(TimeSpan.MaxValue);
+            //            driver.Manage().Logs.GetLog(LogType.Browser);
+
+            //return driver;
+            //return null;
+            return driver;
+        }
+
+        private void AutoProcessFile(IWebDriver driver, string filePath)
+        {
+            try
+            {
                 DoAutoProcessFile (driver, filePath);
             }
             catch (Exception ex)
             {
-                AddMessage($"Exception: {ex.Message}");
-            }
-            finally
-            {
-                driver.Dispose();
-                driver.Quit();
+                AddMessage($"Exception: {ex.Message} : {ex.StackTrace}");
             }
         }
 
-        private void GetRisAndStoreInOutputFile(ChromeDriver driver, string filePath)
+        private void GetRisAndStoreInOutputFile(IWebDriver driver, string filePath)
         {
             GetUriAndWriteTextAreaContentToFile(driver, filePath, "risOutput");
         }
 
-        private void GetJsonAndStoreInOutputFile(ChromeDriver driver, string filePath)
+        private void GetJsonAndStoreInOutputFile(IWebDriver driver, string filePath)
         {
             GetUriAndWriteTextAreaContentToFile(driver, filePath, "output");
         }
 
-        private void GetUriAndWriteTextAreaContentToFile(ChromeDriver driver, string inputFilePath, string textAreaId)
+        private void GetUriAndWriteTextAreaContentToFile(IWebDriver driver, string inputFilePath, string textAreaId)
         {
             //System.Diagnostics.Debugger.Launch();
             var uri = new Uri(inputFilePath).AbsoluteUri;
-            driver.Url = uri;
-            driver.Navigate();
+            driver.Navigate().GoToUrl(uri);
             var output = WaitForElement(driver, textAreaId);
 
             //System.Diagnostics.Debugger.Launch();
@@ -364,9 +387,10 @@ namespace migratorGui
             File.WriteAllText(outputFilePath, json);
         }
 
-        private IWebElement WaitForElement(ChromeDriver driver, string elementId)
+        private IWebElement WaitForElement(IWebDriver driver, string elementId)
         {
-            return driver.WaitForElement(By.Id(elementId), uint.MaxValue, false);
+            var wait = new WebDriverWait(driver, TimeSpan.FromDays(1));
+            return wait.Until(d => d.FindElement(By.Id(elementId)));
         }
 
         private static string MakeOutputFilePath(string inputFilePath)
@@ -403,7 +427,39 @@ namespace migratorGui
             Properties.Settings.Default.Save();
 
             DoFindFiles(recursive: true, usePatterns: true);
-            DoAddBootstrap();
+            DoAddBootstrap(newMethod: true);
+        }
+
+        private void fileList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void testButton_Click(object sender, EventArgs e)
+        {
+            using (IWebDriver driver = new ChromeDriver())
+            {
+                //Notice navigation is slightly different than the Java version
+                //This is because 'get' is a keyword in C#
+                driver.Navigate().GoToUrl("http://www.google.com/");
+
+                // Find the text input element by its name
+                IWebElement query = driver.FindElement(By.Name("q"));
+
+                // Enter something to search for
+                query.SendKeys("Cheese");
+
+                // Now submit the form. WebDriver will find the form for us from the element
+                query.Submit();
+
+                // Google's search is rendered dynamically with JavaScript.
+                // Wait for the page to load, timeout after 10 seconds
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+                wait.Until(d => d.Title.StartsWith("cheese", StringComparison.OrdinalIgnoreCase));
+
+                // Should see: "Cheese - Google Search" (for an English locale)
+                Console.WriteLine("Page title is: " + driver.Title);
+            }
         }
     }
 }

@@ -42,6 +42,7 @@
             this.findFilesInFolderTree = new System.Windows.Forms.Button();
             this.RisIdentifierPattern = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.testButton = new System.Windows.Forms.Button();
             this.runAutomatedButton = new System.Windows.Forms.Button();
             this.JsonIdentifierPattern = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -60,6 +61,7 @@
             // 
             // exportFolder
             // 
+            this.exportFolder.Font = new System.Drawing.Font("Consolas", 8F);
             this.exportFolder.Location = new System.Drawing.Point(13, 30);
             this.exportFolder.Name = "exportFolder";
             this.exportFolder.Size = new System.Drawing.Size(271, 20);
@@ -68,15 +70,18 @@
             // 
             // fileList
             // 
+            this.fileList.Font = new System.Drawing.Font("Consolas", 8F);
             this.fileList.FormattingEnabled = true;
             this.fileList.Location = new System.Drawing.Point(13, 57);
             this.fileList.Name = "fileList";
             this.fileList.SelectionMode = System.Windows.Forms.SelectionMode.None;
             this.fileList.Size = new System.Drawing.Size(271, 290);
             this.fileList.TabIndex = 3;
+            this.fileList.SelectedIndexChanged += new System.EventHandler(this.fileList_SelectedIndexChanged);
             // 
             // processedFiles
             // 
+            this.processedFiles.Font = new System.Drawing.Font("Consolas", 8F);
             this.processedFiles.FormattingEnabled = true;
             this.processedFiles.Location = new System.Drawing.Point(432, 57);
             this.processedFiles.Name = "processedFiles";
@@ -87,6 +92,7 @@
             // 
             this.messages.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.messages.Font = new System.Drawing.Font("Consolas", 8F);
             this.messages.Location = new System.Drawing.Point(13, 353);
             this.messages.Multiline = true;
             this.messages.Name = "messages";
@@ -100,6 +106,7 @@
             this.groupBox1.Controls.Add(this.processFilesButton);
             this.groupBox1.Controls.Add(this.ToRIS);
             this.groupBox1.Controls.Add(this.ToJSON);
+            this.groupBox1.Enabled = false;
             this.groupBox1.Location = new System.Drawing.Point(292, 30);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(134, 128);
@@ -115,7 +122,6 @@
             this.findFilesButton.TabIndex = 6;
             this.findFilesButton.Text = "Find files in folder";
             this.findFilesButton.UseVisualStyleBackColor = true;
-            this.findFilesButton.Click += new System.EventHandler(this.findFilesButton_Click);
             // 
             // processFilesButton
             // 
@@ -126,7 +132,6 @@
             this.processFilesButton.TabIndex = 5;
             this.processFilesButton.Text = "Add Bootstrap >>";
             this.processFilesButton.UseVisualStyleBackColor = true;
-            this.processFilesButton.Click += new System.EventHandler(this.processFiles_Click);
             // 
             // ToRIS
             // 
@@ -155,12 +160,13 @@
             this.groupBox2.Controls.Add(this.findFilesInFolderTree);
             this.groupBox2.Controls.Add(this.RisIdentifierPattern);
             this.groupBox2.Controls.Add(this.label3);
+            this.groupBox2.Controls.Add(this.testButton);
             this.groupBox2.Controls.Add(this.runAutomatedButton);
             this.groupBox2.Controls.Add(this.JsonIdentifierPattern);
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Location = new System.Drawing.Point(290, 164);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(136, 173);
+            this.groupBox2.Size = new System.Drawing.Size(136, 183);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "New";
@@ -177,6 +183,7 @@
             // 
             // RisIdentifierPattern
             // 
+            this.RisIdentifierPattern.Font = new System.Drawing.Font("Consolas", 8F);
             this.RisIdentifierPattern.Location = new System.Drawing.Point(11, 77);
             this.RisIdentifierPattern.Name = "RisIdentifierPattern";
             this.RisIdentifierPattern.Size = new System.Drawing.Size(115, 20);
@@ -191,6 +198,16 @@
             this.label3.TabIndex = 14;
             this.label3.Text = "RIS identifier pattern";
             // 
+            // testButton
+            // 
+            this.testButton.Location = new System.Drawing.Point(11, 160);
+            this.testButton.Name = "testButton";
+            this.testButton.Size = new System.Drawing.Size(115, 23);
+            this.testButton.TabIndex = 13;
+            this.testButton.Text = "Test";
+            this.testButton.UseVisualStyleBackColor = true;
+            this.testButton.Click += new System.EventHandler(this.testButton_Click);
+            // 
             // runAutomatedButton
             // 
             this.runAutomatedButton.Location = new System.Drawing.Point(11, 134);
@@ -203,6 +220,7 @@
             // 
             // JsonIdentifierPattern
             // 
+            this.JsonIdentifierPattern.Font = new System.Drawing.Font("Consolas", 8F);
             this.JsonIdentifierPattern.Location = new System.Drawing.Point(11, 32);
             this.JsonIdentifierPattern.Name = "JsonIdentifierPattern";
             this.JsonIdentifierPattern.Size = new System.Drawing.Size(115, 20);
@@ -262,6 +280,7 @@
         private System.Windows.Forms.Button processFilesButton;
         private System.Windows.Forms.Button findFilesButton;
         private System.Windows.Forms.Button findFilesInFolderTree;
+        private System.Windows.Forms.Button testButton;
     }
 }
 
