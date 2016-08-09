@@ -29,14 +29,13 @@ namespace migratorGui
 
             //exportFolder.Text = @"N:\dev\starHtmlMigrator\LocalOnly";
             exportFolder.Text = Properties.Settings.Default.RootFolder;
-            ToJSON.Checked = !Properties.Settings.Default.ToRIS;
-            ToRIS.Checked = Properties.Settings.Default.ToRIS;
             JsonIdentifierPattern.Text = Properties.Settings.Default.JsonIdentifierPattern;
             RisIdentifierPattern.Text = Properties.Settings.Default.RisIdentifierPattern;
+            RisJsonIdentifierPattern.Text = Properties.Settings.Default.RisJsonIdentifierPattern;
 
             one = fileList.Left;
-            two = findFilesButton.Left - fileList.Right;
-            three = processedFiles.Left - findFilesButton.Right;
+            two = findFilesInFolderTree.Left - fileList.Right;
+            three = processedFiles.Left - findFilesInFolderTree.Right;
             four = Width - processedFiles.Right;
         }
 
@@ -79,9 +78,22 @@ namespace migratorGui
             var assetsFolderPath = GetAncestor(exeFolder, Properties.Settings.Default.AssetFolderAncestorGenerations);
             var assetsFolderUri = new Uri(assetsFolderPath).AbsoluteUri;
             var flavour = GetFileFlavour(filePath);
-            var suffix = newMethod 
-                            ? (flavour == Flavour.Json ? "JSON" : flavour == Flavour.Ris ? "RIS" : null)
-                            : (ToJSON.Checked ? "JSON" : ToRIS.Checked ? "RIS" : null);
+            string suffix;
+            switch (flavour)
+            {
+                case Flavour.Json:
+                    suffix = "JSON";
+                    break;
+                case Flavour.Ris:
+                    suffix = "RIS";
+                    break;
+                case Flavour.RisJson:
+                    suffix = "RIS_JSON";
+                    break;
+                default:
+                    suffix = null;
+                    break;
+            }
 
             var bootstrapCode = $"<link href='{assetsFolderUri}/migrator.css' rel='stylesheet' type='text/css'>" +
                                 "<script src = 'http://code.jquery.com/jquery-3.0.0.min.js' " +
@@ -96,7 +108,8 @@ namespace migratorGui
         {
             None = 0,
             Json = 1,
-            Ris = 2
+            Ris = 2,
+            RisJson = 3
         }
 
         private static Flavour GetFileFlavour(string filePath)
@@ -110,6 +123,10 @@ namespace migratorGui
             else if (filePath.Contains(Properties.Settings.Default.RisIdentifierPattern))
             {
                 flavour = Flavour.Ris;
+            }
+            else if (filePath.Contains(Properties.Settings.Default.RisJsonIdentifierPattern))
+            {
+                flavour = Flavour.RisJson;
             }
 
             return flavour;
@@ -144,7 +161,6 @@ namespace migratorGui
                 AddMessage($"No html files found at \"{FolderPath}\". Aborting.");
                 return;
             }
-            processFilesButton.Enabled = true;
 
             var prefix = $"{FolderPath}\\";
 
@@ -159,9 +175,7 @@ namespace migratorGui
                 fileList.Items.Add($"[{flavour}] {suffix}");
             });
 
-            var nextButtonName = recursive
-                ? runAutomatedButton.Text
-                : processFilesButton.Text;
+            var nextButtonName = runAutomatedButton.Text;
 
             AddMessage($"Files found. Please press the '{nextButtonName}' button.");
         }
@@ -186,7 +200,6 @@ namespace migratorGui
 
         private void DoAddBootstrap(bool newMethod)
         {
-            Properties.Settings.Default.ToRIS = ToRIS.Checked;
             Properties.Settings.Default.Save();
 
             var selectedFiles = fileList.SelectedIndices.Cast<int>()
@@ -235,7 +248,7 @@ namespace migratorGui
         private void Form1_SizeChanged(object sender, EventArgs e)
         {
             var availWidth = Width 
-                - findFilesButton.Width 
+                - findFilesInFolderTree.Width 
                 - one - two - three - four;
 
             var a = availWidth/2;
@@ -246,10 +259,7 @@ namespace migratorGui
 
             new Control[]
             {
-                //findFilesButton,
-                //processFilesButton,
                 processedFiles,
-                groupBox1,
                 groupBox2
             }.ForEach(c => c.Left += deltaA);
 
@@ -260,7 +270,6 @@ namespace migratorGui
 
         private void exportFolder_TextChanged(object sender, EventArgs e)
         {
-            processFilesButton.Enabled = false;
             FolderPath = exportFolder.Text.Trim();
         }
 
@@ -318,6 +327,11 @@ namespace migratorGui
                     GetRisAndStoreInOutputFile(driver, filePath);
                     AddMessage($"[Finish] [RIS]  Processing file '{filePath}'");
                     break;
+                case Flavour.RisJson:
+                    AddMessage($"[Start]  [RIS-JSON]  Processing file '{filePath}'");
+                    GetRisJsonAndStoreInOutputFile(driver, filePath);
+                    AddMessage($"[Finish] [RIS-JSON]  Processing file '{filePath}'");
+                    break;
                 case Flavour.None:
                     AddMessage($"File neither JSON nor RIS: '{filePath}'.");
                     break;
@@ -366,6 +380,10 @@ namespace migratorGui
         {
             GetUriAndWriteTextAreaContentToFile(driver, filePath, "risOutput");
         }
+        private void GetRisJsonAndStoreInOutputFile(IWebDriver driver, string filePath)
+        {
+            GetUriAndWriteTextAreaContentToFile(driver, filePath, "output");
+        }
 
         private void GetJsonAndStoreInOutputFile(IWebDriver driver, string filePath)
         {
@@ -402,11 +420,22 @@ namespace migratorGui
             var folder = Path.Combine(Path.GetDirectoryName(inputFilePath), "OutputFiles");
             var fileName = Path.GetFileName(inputFilePath);
             var flavour = GetFileFlavour(inputFilePath);
-            var flavourSuffix = flavour == Flavour.Json
-                ? "json"
-                : flavour == Flavour.Ris
-                    ? "ris"
-                    : "error";
+            string flavourSuffix;
+            switch (flavour)
+            {
+                case Flavour.Json:
+                    flavourSuffix = "json";
+                    break;
+                case Flavour.Ris:
+                    flavourSuffix = "ris";
+                    break;
+                case Flavour.RisJson:
+                    flavourSuffix = "risJson";
+                    break;
+                default:
+                    flavourSuffix = "error";
+                    break;
+            }
 
             var outputFileName = $"{fileName}.{flavourSuffix}.txt";
             var outputFilePath = Path.Combine(folder, outputFileName);
@@ -424,6 +453,7 @@ namespace migratorGui
         {
             Properties.Settings.Default.JsonIdentifierPattern = JsonIdentifierPattern.Text.Trim();
             Properties.Settings.Default.RisIdentifierPattern = RisIdentifierPattern.Text.Trim();
+            Properties.Settings.Default.RisJsonIdentifierPattern = RisJsonIdentifierPattern.Text.Trim();
             Properties.Settings.Default.Save();
 
             DoFindFiles(recursive: true, usePatterns: true);
@@ -433,33 +463,6 @@ namespace migratorGui
         private void fileList_SelectedIndexChanged(object sender, EventArgs e)
         {
 
-        }
-
-        private void testButton_Click(object sender, EventArgs e)
-        {
-            using (IWebDriver driver = new ChromeDriver())
-            {
-                //Notice navigation is slightly different than the Java version
-                //This is because 'get' is a keyword in C#
-                driver.Navigate().GoToUrl("http://www.google.com/");
-
-                // Find the text input element by its name
-                IWebElement query = driver.FindElement(By.Name("q"));
-
-                // Enter something to search for
-                query.SendKeys("Cheese");
-
-                // Now submit the form. WebDriver will find the form for us from the element
-                query.Submit();
-
-                // Google's search is rendered dynamically with JavaScript.
-                // Wait for the page to load, timeout after 10 seconds
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-                wait.Until(d => d.Title.StartsWith("cheese", StringComparison.OrdinalIgnoreCase));
-
-                // Should see: "Cheese - Google Search" (for an English locale)
-                Console.WriteLine("Page title is: " + driver.Title);
-            }
         }
     }
 }

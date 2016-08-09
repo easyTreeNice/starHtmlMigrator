@@ -123,7 +123,7 @@
                     return fields;
                 })();
 
-                var id = getColumnFieldValue(rowColumns, 'Study details', 'Ref Id');
+                var id = getColumnFieldValue(rowColumns, 'Star Study Id', 'Ref Id');
 
                 studies.push({
                     studyId: id,

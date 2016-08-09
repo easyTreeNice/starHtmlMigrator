@@ -37,18 +37,6 @@ namespace migratorGui.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool ToRIS {
-            get {
-                return ((bool)(this["ToRIS"]));
-            }
-            set {
-                this["ToRIS"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("3")]
         public int AssetFolderAncestorGenerations {
             get {
@@ -80,6 +68,18 @@ namespace migratorGui.Properties {
             }
             set {
                 this["JsonIdentifierPattern"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RisJsonIdentifierPattern {
+            get {
+                return ((string)(this["RisJsonIdentifierPattern"]));
+            }
+            set {
+                this["RisJsonIdentifierPattern"] = value;
             }
         }
     }

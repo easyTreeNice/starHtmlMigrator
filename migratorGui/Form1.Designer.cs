@@ -33,20 +33,15 @@
             this.fileList = new System.Windows.Forms.ListBox();
             this.processedFiles = new System.Windows.Forms.ListBox();
             this.messages = new System.Windows.Forms.TextBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.findFilesButton = new System.Windows.Forms.Button();
-            this.processFilesButton = new System.Windows.Forms.Button();
-            this.ToRIS = new System.Windows.Forms.RadioButton();
-            this.ToJSON = new System.Windows.Forms.RadioButton();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.findFilesInFolderTree = new System.Windows.Forms.Button();
             this.RisIdentifierPattern = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.testButton = new System.Windows.Forms.Button();
             this.runAutomatedButton = new System.Windows.Forms.Button();
             this.JsonIdentifierPattern = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.groupBox1.SuspendLayout();
+            this.RisJsonIdentifierPattern = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -64,7 +59,7 @@
             this.exportFolder.Font = new System.Drawing.Font("Consolas", 8F);
             this.exportFolder.Location = new System.Drawing.Point(13, 30);
             this.exportFolder.Name = "exportFolder";
-            this.exportFolder.Size = new System.Drawing.Size(271, 20);
+            this.exportFolder.Size = new System.Drawing.Size(251, 20);
             this.exportFolder.TabIndex = 1;
             this.exportFolder.TextChanged += new System.EventHandler(this.exportFolder_TextChanged);
             // 
@@ -75,7 +70,7 @@
             this.fileList.Location = new System.Drawing.Point(13, 57);
             this.fileList.Name = "fileList";
             this.fileList.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.fileList.Size = new System.Drawing.Size(271, 290);
+            this.fileList.Size = new System.Drawing.Size(251, 290);
             this.fileList.TabIndex = 3;
             this.fileList.SelectedIndexChanged += new System.EventHandler(this.fileList_SelectedIndexChanged);
             // 
@@ -83,9 +78,9 @@
             // 
             this.processedFiles.Font = new System.Drawing.Font("Consolas", 8F);
             this.processedFiles.FormattingEnabled = true;
-            this.processedFiles.Location = new System.Drawing.Point(432, 57);
+            this.processedFiles.Location = new System.Drawing.Point(450, 57);
             this.processedFiles.Name = "processedFiles";
-            this.processedFiles.Size = new System.Drawing.Size(279, 290);
+            this.processedFiles.Size = new System.Drawing.Size(251, 290);
             this.processedFiles.TabIndex = 5;
             // 
             // messages
@@ -100,82 +95,28 @@
             this.messages.Size = new System.Drawing.Size(698, 100);
             this.messages.TabIndex = 6;
             // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.findFilesButton);
-            this.groupBox1.Controls.Add(this.processFilesButton);
-            this.groupBox1.Controls.Add(this.ToRIS);
-            this.groupBox1.Controls.Add(this.ToJSON);
-            this.groupBox1.Enabled = false;
-            this.groupBox1.Location = new System.Drawing.Point(292, 30);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(134, 128);
-            this.groupBox1.TabIndex = 7;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "OLd";
-            // 
-            // findFilesButton
-            // 
-            this.findFilesButton.Location = new System.Drawing.Point(9, 19);
-            this.findFilesButton.Name = "findFilesButton";
-            this.findFilesButton.Size = new System.Drawing.Size(115, 23);
-            this.findFilesButton.TabIndex = 6;
-            this.findFilesButton.Text = "Find files in folder";
-            this.findFilesButton.UseVisualStyleBackColor = true;
-            // 
-            // processFilesButton
-            // 
-            this.processFilesButton.Enabled = false;
-            this.processFilesButton.Location = new System.Drawing.Point(9, 94);
-            this.processFilesButton.Name = "processFilesButton";
-            this.processFilesButton.Size = new System.Drawing.Size(115, 23);
-            this.processFilesButton.TabIndex = 5;
-            this.processFilesButton.Text = "Add Bootstrap >>";
-            this.processFilesButton.UseVisualStyleBackColor = true;
-            // 
-            // ToRIS
-            // 
-            this.ToRIS.AutoSize = true;
-            this.ToRIS.Location = new System.Drawing.Point(9, 71);
-            this.ToRIS.Name = "ToRIS";
-            this.ToRIS.Size = new System.Drawing.Size(77, 17);
-            this.ToRIS.TabIndex = 0;
-            this.ToRIS.Text = "Create RIS";
-            this.ToRIS.UseVisualStyleBackColor = true;
-            // 
-            // ToJSON
-            // 
-            this.ToJSON.AutoSize = true;
-            this.ToJSON.Checked = true;
-            this.ToJSON.Location = new System.Drawing.Point(9, 48);
-            this.ToJSON.Name = "ToJSON";
-            this.ToJSON.Size = new System.Drawing.Size(87, 17);
-            this.ToJSON.TabIndex = 0;
-            this.ToJSON.TabStop = true;
-            this.ToJSON.Text = "Create JSON";
-            this.ToJSON.UseVisualStyleBackColor = true;
-            // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.RisJsonIdentifierPattern);
+            this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.findFilesInFolderTree);
             this.groupBox2.Controls.Add(this.RisIdentifierPattern);
             this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Controls.Add(this.testButton);
             this.groupBox2.Controls.Add(this.runAutomatedButton);
             this.groupBox2.Controls.Add(this.JsonIdentifierPattern);
             this.groupBox2.Controls.Add(this.label2);
-            this.groupBox2.Location = new System.Drawing.Point(290, 164);
+            this.groupBox2.Location = new System.Drawing.Point(270, 57);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(136, 183);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(8, 3, 8, 3);
+            this.groupBox2.Size = new System.Drawing.Size(176, 246);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "New";
             // 
             // findFilesInFolderTree
             // 
-            this.findFilesInFolderTree.Location = new System.Drawing.Point(11, 105);
+            this.findFilesInFolderTree.Location = new System.Drawing.Point(11, 167);
             this.findFilesInFolderTree.Name = "findFilesInFolderTree";
-            this.findFilesInFolderTree.Size = new System.Drawing.Size(115, 23);
+            this.findFilesInFolderTree.Size = new System.Drawing.Size(154, 23);
             this.findFilesInFolderTree.TabIndex = 16;
             this.findFilesInFolderTree.Text = "Find files in folder tree";
             this.findFilesInFolderTree.UseVisualStyleBackColor = true;
@@ -186,7 +127,7 @@
             this.RisIdentifierPattern.Font = new System.Drawing.Font("Consolas", 8F);
             this.RisIdentifierPattern.Location = new System.Drawing.Point(11, 77);
             this.RisIdentifierPattern.Name = "RisIdentifierPattern";
-            this.RisIdentifierPattern.Size = new System.Drawing.Size(115, 20);
+            this.RisIdentifierPattern.Size = new System.Drawing.Size(154, 20);
             this.RisIdentifierPattern.TabIndex = 15;
             // 
             // label3
@@ -198,22 +139,11 @@
             this.label3.TabIndex = 14;
             this.label3.Text = "RIS identifier pattern";
             // 
-            // testButton
-            // 
-            this.testButton.Enabled = false;
-            this.testButton.Location = new System.Drawing.Point(11, 160);
-            this.testButton.Name = "testButton";
-            this.testButton.Size = new System.Drawing.Size(115, 23);
-            this.testButton.TabIndex = 13;
-            this.testButton.Text = "Test";
-            this.testButton.UseVisualStyleBackColor = true;
-            this.testButton.Click += new System.EventHandler(this.testButton_Click);
-            // 
             // runAutomatedButton
             // 
-            this.runAutomatedButton.Location = new System.Drawing.Point(11, 134);
+            this.runAutomatedButton.Location = new System.Drawing.Point(11, 196);
             this.runAutomatedButton.Name = "runAutomatedButton";
-            this.runAutomatedButton.Size = new System.Drawing.Size(115, 23);
+            this.runAutomatedButton.Size = new System.Drawing.Size(154, 23);
             this.runAutomatedButton.TabIndex = 13;
             this.runAutomatedButton.Text = "Auto-process >>";
             this.runAutomatedButton.UseVisualStyleBackColor = true;
@@ -224,7 +154,7 @@
             this.JsonIdentifierPattern.Font = new System.Drawing.Font("Consolas", 8F);
             this.JsonIdentifierPattern.Location = new System.Drawing.Point(11, 32);
             this.JsonIdentifierPattern.Name = "JsonIdentifierPattern";
-            this.JsonIdentifierPattern.Size = new System.Drawing.Size(115, 20);
+            this.JsonIdentifierPattern.Size = new System.Drawing.Size(154, 20);
             this.JsonIdentifierPattern.TabIndex = 12;
             // 
             // label2
@@ -236,13 +166,29 @@
             this.label2.TabIndex = 11;
             this.label2.Text = "JSON identifier pattern";
             // 
+            // RisJsonIdentifierPattern
+            // 
+            this.RisJsonIdentifierPattern.Font = new System.Drawing.Font("Consolas", 8F);
+            this.RisJsonIdentifierPattern.Location = new System.Drawing.Point(12, 121);
+            this.RisJsonIdentifierPattern.Name = "RisJsonIdentifierPattern";
+            this.RisJsonIdentifierPattern.Size = new System.Drawing.Size(153, 20);
+            this.RisJsonIdentifierPattern.TabIndex = 18;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(8, 105);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(134, 13);
+            this.label4.TabIndex = 17;
+            this.label4.Text = "RIS-JSON identifier pattern";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(726, 464);
             this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.messages);
             this.Controls.Add(this.processedFiles);
             this.Controls.Add(this.fileList);
@@ -253,8 +199,6 @@
             this.Name = "Form1";
             this.Text = "STAR migrator GUI";
             this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
@@ -269,19 +213,15 @@
         private System.Windows.Forms.ListBox fileList;
         private System.Windows.Forms.ListBox processedFiles;
         private System.Windows.Forms.TextBox messages;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.RadioButton ToRIS;
-        private System.Windows.Forms.RadioButton ToJSON;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.TextBox RisIdentifierPattern;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button runAutomatedButton;
         private System.Windows.Forms.TextBox JsonIdentifierPattern;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button processFilesButton;
-        private System.Windows.Forms.Button findFilesButton;
         private System.Windows.Forms.Button findFilesInFolderTree;
-        private System.Windows.Forms.Button testButton;
+        private System.Windows.Forms.TextBox RisJsonIdentifierPattern;
+        private System.Windows.Forms.Label label4;
     }
 }
 

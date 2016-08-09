@@ -5,9 +5,6 @@
     <Setting Name="RootFolder" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="ToRIS" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="AssetFolderAncestorGenerations" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">3</Value>
     </Setting>
@@ -15,6 +12,9 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="JsonIdentifierPattern" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="RisJsonIdentifierPattern" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>
