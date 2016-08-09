@@ -74,13 +74,28 @@
             return titles;
         })();
 
-        function getColumnFieldValue(rowColumns, columnName, fieldName) {
+        function arrayContains(ar, value) {
+            var match = false;
+
+            $.each(ar, function (idx, val) {
+                var more = true;
+                if (val.toLocaleLowerCase() === value.toLocaleLowerCase()) {
+                    match = true;
+                    more = false;
+                }
+                return more;
+            });
+
+            return match;
+        }
+
+        function getColumnFieldValue(rowColumns, columnNames, fieldName) {
             var col, value;
 
             if (rowColumns) {
                 $.each(rowColumns, function(idx, rc) {
                     var more = true;
-                    if (rc.column === columnName) {
+                    if (arrayContains(columnNames, rc.column)) {
                         col = rc;
                         more = false;
                     }
@@ -123,7 +138,7 @@
                     return fields;
                 })();
 
-                var id = getColumnFieldValue(rowColumns, 'Study details', 'Ref Id');
+                var id = getColumnFieldValue(rowColumns, ['Study details', 'Bibliographic details'], 'Ref Id');
 
                 studies.push({
                     studyId: id,
