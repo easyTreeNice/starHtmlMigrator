@@ -65,7 +65,7 @@
             return fields;
         }
 
-        var colulmnTitles = (function () {
+        var columnTitles = (function () {
             var titles = [];
             $('#assignedstudydata-table > thead > tr > th')
                 .each(function (idx, elem) {
@@ -130,7 +130,7 @@
                             if (idx === 0) return;
                             td = $(td);
                             fields.push({
-                                column: colulmnTitles[idx],
+                                column: columnTitles[idx],
                                 columnId: td.attr('id'),
                                 fields: getColumnFields(td)
                             });

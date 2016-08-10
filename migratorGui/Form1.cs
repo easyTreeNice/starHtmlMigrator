@@ -32,6 +32,7 @@ namespace migratorGui
             JsonIdentifierPattern.Text = Properties.Settings.Default.JsonIdentifierPattern;
             RisIdentifierPattern.Text = Properties.Settings.Default.RisIdentifierPattern;
             RisJsonIdentifierPattern.Text = Properties.Settings.Default.RisJsonIdentifierPattern;
+            StudyStatusMapIdentifierPattern.Text = Properties.Settings.Default.StudyStatusMapIdentifierPattern;
 
             one = fileList.Left;
             two = findFilesInFolderTree.Left - fileList.Right;
@@ -90,6 +91,9 @@ namespace migratorGui
                 case Flavour.RisJson:
                     suffix = "RIS_JSON";
                     break;
+                case Flavour.StudyStatusMap:
+                    suffix = "StudyStatusMap";
+                    break;
                 default:
                     suffix = null;
                     break;
@@ -109,7 +113,8 @@ namespace migratorGui
             None = 0,
             Json = 1,
             Ris = 2,
-            RisJson = 3
+            RisJson = 3,
+            StudyStatusMap = 4
         }
 
         private static Flavour GetFileFlavour(string filePath)
@@ -127,6 +132,10 @@ namespace migratorGui
             else if (filePath.Contains(Properties.Settings.Default.RisJsonIdentifierPattern))
             {
                 flavour = Flavour.RisJson;
+            }
+            else if (filePath.Contains(Properties.Settings.Default.StudyStatusMapIdentifierPattern))
+            {
+                flavour = Flavour.StudyStatusMap;
             }
 
             return flavour;
@@ -332,6 +341,11 @@ namespace migratorGui
                     GetRisJsonAndStoreInOutputFile(driver, filePath);
                     AddMessage($"[Finish] [RIS-JSON]  Processing file '{filePath}'");
                     break;
+                case Flavour.StudyStatusMap:
+                    AddMessage($"[Start]  [StudyStatusMap]  Processing file '{filePath}'");
+                    GetStudyStatusMapAndStoreInOutputFile(driver, filePath);
+                    AddMessage($"[Finish] [StudyStatusMap]  Processing file '{filePath}'");
+                    break;
                 case Flavour.None:
                     AddMessage($"File neither JSON nor RIS: '{filePath}'.");
                     break;
@@ -343,9 +357,6 @@ namespace migratorGui
             var driverOptions = new ChromeOptions();
             driverOptions.SetLoggingPreference(LogType.Driver, 0);
             driverOptions.SetLoggingPreference(LogType.Browser, 0);
-            //driverOptions.SetLoggingPreference(LogType.Client, 0);
-            //driverOptions.SetLoggingPreference(LogType.Profiler, 0);
-            //driverOptions.SetLoggingPreference(LogType.Server, 0);
             driverOptions.AddArgument("--log-level=0");
             driverOptions.AddArgument("--verbose");
             var logPath = GetLogFilePath();
@@ -354,13 +365,6 @@ namespace migratorGui
             AddMessage($"LogFilePath set to {logPath}");
             var driver = new ChromeDriver(_service as ChromeDriverService, driverOptions, Timeout.InfiniteTimeSpan);
 
-            //var driver = new RemoteWebDriver(new Uri("http://localhost:9515"), DesiredCapabilities.Chrome());    
-            //driver.Manage().Timeouts().SetPageLoadTimeout(TimeSpan.MaxValue);
-            //driver.Manage().Timeouts().SetScriptTimeout(TimeSpan.MaxValue);
-            //            driver.Manage().Logs.GetLog(LogType.Browser);
-
-            //return driver;
-            //return null;
             return driver;
         }
 
@@ -381,6 +385,10 @@ namespace migratorGui
             GetUriAndWriteTextAreaContentToFile(driver, filePath, "risOutput");
         }
         private void GetRisJsonAndStoreInOutputFile(IWebDriver driver, string filePath)
+        {
+            GetUriAndWriteTextAreaContentToFile(driver, filePath, "output");
+        }
+        private void GetStudyStatusMapAndStoreInOutputFile(IWebDriver driver, string filePath)
         {
             GetUriAndWriteTextAreaContentToFile(driver, filePath, "output");
         }
@@ -432,6 +440,9 @@ namespace migratorGui
                 case Flavour.RisJson:
                     flavourSuffix = "risJson";
                     break;
+                case Flavour.StudyStatusMap:
+                    flavourSuffix = "studyStatusMap";
+                    break;
                 default:
                     flavourSuffix = "error";
                     break;
@@ -454,6 +465,7 @@ namespace migratorGui
             Properties.Settings.Default.JsonIdentifierPattern = JsonIdentifierPattern.Text.Trim();
             Properties.Settings.Default.RisIdentifierPattern = RisIdentifierPattern.Text.Trim();
             Properties.Settings.Default.RisJsonIdentifierPattern = RisJsonIdentifierPattern.Text.Trim();
+            Properties.Settings.Default.StudyStatusMapIdentifierPattern = StudyStatusMapIdentifierPattern.Text.Trim();
             Properties.Settings.Default.Save();
 
             DoFindFiles(recursive: true, usePatterns: true);

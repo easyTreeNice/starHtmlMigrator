@@ -34,14 +34,16 @@
             this.processedFiles = new System.Windows.Forms.ListBox();
             this.messages = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.RisJsonIdentifierPattern = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.findFilesInFolderTree = new System.Windows.Forms.Button();
             this.RisIdentifierPattern = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.runAutomatedButton = new System.Windows.Forms.Button();
             this.JsonIdentifierPattern = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.RisJsonIdentifierPattern = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
+            this.StudyStatusMapIdentifierPattern = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -97,6 +99,8 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.StudyStatusMapIdentifierPattern);
+            this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.RisJsonIdentifierPattern);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.findFilesInFolderTree);
@@ -108,13 +112,30 @@
             this.groupBox2.Location = new System.Drawing.Point(270, 57);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(8, 3, 8, 3);
-            this.groupBox2.Size = new System.Drawing.Size(176, 246);
+            this.groupBox2.Size = new System.Drawing.Size(176, 290);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
             // 
+            // RisJsonIdentifierPattern
+            // 
+            this.RisJsonIdentifierPattern.Font = new System.Drawing.Font("Consolas", 8F);
+            this.RisJsonIdentifierPattern.Location = new System.Drawing.Point(12, 122);
+            this.RisJsonIdentifierPattern.Name = "RisJsonIdentifierPattern";
+            this.RisJsonIdentifierPattern.Size = new System.Drawing.Size(153, 20);
+            this.RisJsonIdentifierPattern.TabIndex = 18;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(8, 106);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(134, 13);
+            this.label4.TabIndex = 17;
+            this.label4.Text = "RIS-JSON identifier pattern";
+            // 
             // findFilesInFolderTree
             // 
-            this.findFilesInFolderTree.Location = new System.Drawing.Point(11, 167);
+            this.findFilesInFolderTree.Location = new System.Drawing.Point(11, 223);
             this.findFilesInFolderTree.Name = "findFilesInFolderTree";
             this.findFilesInFolderTree.Size = new System.Drawing.Size(154, 23);
             this.findFilesInFolderTree.TabIndex = 16;
@@ -141,7 +162,7 @@
             // 
             // runAutomatedButton
             // 
-            this.runAutomatedButton.Location = new System.Drawing.Point(11, 196);
+            this.runAutomatedButton.Location = new System.Drawing.Point(11, 252);
             this.runAutomatedButton.Name = "runAutomatedButton";
             this.runAutomatedButton.Size = new System.Drawing.Size(154, 23);
             this.runAutomatedButton.TabIndex = 13;
@@ -166,22 +187,22 @@
             this.label2.TabIndex = 11;
             this.label2.Text = "JSON identifier pattern";
             // 
-            // RisJsonIdentifierPattern
+            // StudyStatusMapIdentifierPattern
             // 
-            this.RisJsonIdentifierPattern.Font = new System.Drawing.Font("Consolas", 8F);
-            this.RisJsonIdentifierPattern.Location = new System.Drawing.Point(12, 121);
-            this.RisJsonIdentifierPattern.Name = "RisJsonIdentifierPattern";
-            this.RisJsonIdentifierPattern.Size = new System.Drawing.Size(153, 20);
-            this.RisJsonIdentifierPattern.TabIndex = 18;
+            this.StudyStatusMapIdentifierPattern.Font = new System.Drawing.Font("Consolas", 8F);
+            this.StudyStatusMapIdentifierPattern.Location = new System.Drawing.Point(12, 167);
+            this.StudyStatusMapIdentifierPattern.Name = "StudyStatusMapIdentifierPattern";
+            this.StudyStatusMapIdentifierPattern.Size = new System.Drawing.Size(153, 20);
+            this.StudyStatusMapIdentifierPattern.TabIndex = 20;
             // 
-            // label4
+            // label5
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(8, 105);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(134, 13);
-            this.label4.TabIndex = 17;
-            this.label4.Text = "RIS-JSON identifier pattern";
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(8, 151);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(163, 13);
+            this.label5.TabIndex = 19;
+            this.label5.Text = "StudyStatusMap identifier pattern";
             // 
             // Form1
             // 
@@ -222,6 +243,8 @@
         private System.Windows.Forms.Button findFilesInFolderTree;
         private System.Windows.Forms.TextBox RisJsonIdentifierPattern;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox StudyStatusMapIdentifierPattern;
+        private System.Windows.Forms.Label label5;
     }
 }
 

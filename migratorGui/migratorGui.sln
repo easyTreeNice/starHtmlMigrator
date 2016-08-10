@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\migrator_JSON.js = ..\migrator_JSON.js
 		..\migrator_RIS.js = ..\migrator_RIS.js
 		..\migrator_RIS_JSON.js = ..\migrator_RIS_JSON.js
+		..\migrator_StudyStatusMap.js = ..\migrator_StudyStatusMap.js
 	EndProjectSection
 EndProject
 Global

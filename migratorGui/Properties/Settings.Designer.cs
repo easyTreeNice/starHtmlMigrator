@@ -82,5 +82,17 @@ namespace migratorGui.Properties {
                 this["RisJsonIdentifierPattern"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string StudyStatusMapIdentifierPattern {
+            get {
+                return ((string)(this["StudyStatusMapIdentifierPattern"]));
+            }
+            set {
+                this["StudyStatusMapIdentifierPattern"] = value;
+            }
+        }
     }
 }

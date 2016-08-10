@@ -46,6 +46,41 @@
             return titles;
         })();
 
+        function getColumnFieldValue(fields, columnName, fieldName) {
+            var col, value;
+
+            if (fields) {
+                $.each(fields, function (idx, rc) {
+                    var more = true;
+                    if (rc.column === columnName) {
+                        col = rc;
+                        more = false;
+                    }
+                    return more;
+                });
+                if (!!col) {
+                    value = col.value;
+                }
+            }
+            return value;
+        }
+
+        function filterFields(fields) {
+            var filtered = [];
+
+            $.each(fields, function (idx, field) {
+                switch (field.column) {
+                    case "Status":
+                        filtered.push({
+                            column: field.value,
+                            value: ""
+                        });
+                        break;
+                }
+            });
+            return filtered;
+        }
+
         var citations = [];
         var rows = $('#assignedstudy-table > tbody > tr');
         var len = rows.length;
@@ -53,7 +88,6 @@
             showProgress('extract', idx + 1, len);
 
             var tr = $(this);
-            var id = tr.attr('id');
             var tds = tr.find('>td');
 
             var fields = (function () {
@@ -61,6 +95,7 @@
                 $.each(tds, function (idx, td) {
                     if (idx === 0) return;
                     td = $(td);
+
                     values.push({
                         column: columnTitles[idx],
                         columnId: td.attr('id'),
@@ -70,9 +105,10 @@
                 return values;
             })();
 
+            var id = getColumnFieldValue(fields, 'Star Study Id');
             citations.push({
                 id: id,
-                fields: fields
+                fields: filterFields(fields)
             });
         });
 

@@ -37,7 +37,7 @@
     }
 
     function extract() {
-        var colulmnTitles = (function () {
+        var columnTitles = (function () {
             var titles = [];
             $('#assignedstudy-table > thead > tr > th')
                 .each(function (idx, elem) {
@@ -96,7 +96,7 @@
                     if (idx === 0) return;
                     td = $(td);
                     values.push({
-                        column: colulmnTitles[idx],
+                        column: columnTitles[idx],
                         columnId: td.attr('id'),
                         value: td.text().trim()
                     });
