@@ -1,4 +1,7 @@
 (function() {
+    function trimmed(str) {
+        return !!str ? str.trim() : str;
+    }
     function visualTidy() {
         function hilight(selector, colorCode) {
             colorCode = colorCode || 'pink';
@@ -111,7 +114,25 @@
             });
         });
 
-        var data = { citations: citations };
+        var titleRegex = /(.*)(?:\(\))/;
+        var reviewTitle = (function() {
+            var html = trimmed($('#main > h2').text());
+            var titleRegex = /(.*)(?:\(step [0-9]+ and [0-9]+ search(?:es)?\))?/;
+            var match = titleRegex.exec(html);
+            var title = !!match ? match[1].trim() : "";
+            var maxLen = 255;
+            if (title && title.length > maxLen) {
+                title = title.substr(0, maxLen);
+            }
+            return title;
+        })();
+//      var data = { citations: citations };
+        var data = {
+            review: {
+                title: reviewTitle
+            },
+            citations: citations
+        };
         return data;
     }
 
@@ -256,15 +277,15 @@
     }
 
     function displayOutput(data) {
-        var json = prettifyJSON(data.citations);
+        var json = prettifyJSON(data);
         var body = $('body');
-        var risText = getRisText(data);
+        //var risText = getRisText(data);
         showProgress('displaying output...', 0, 1);
-        body.prepend([
-            "<textarea id='risOutput' class='collapsed' title='click to expand/collapse'>",
-            risText,
-            "</textarea>"
-        ].join(''));
+        //body.prepend([
+        //    "<textarea id='risOutput' class='collapsed' title='click to expand/collapse'>",
+        //    risText,
+        //    "</textarea>"
+        //].join(''));
         body.prepend([
             "<textarea id='output' class='collapsed' title='click to expand/collapse'>",
             json,
