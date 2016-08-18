@@ -220,21 +220,30 @@
         return risText;
     }
 
+    function saveText(content, filename) {
+        var blob = new Blob([content], { type: 'text/plain', endings: "native" });
+        saveAs(blob, filename);
+    }
+
+
     function displayOutput(data) {
         var json = prettifyJSON(data.citations);
         var body = $('body');
         var risText = getRisText(data);
-        showProgress('displaying output...', 0, 1);
-        body.prepend([
-            "<textarea id='risOutput' class='collapsed' title='click to expand/collapse'>",
-            risText,
-            "</textarea>"
-        ].join(''));
-        body.prepend([
-            "<textarea id='output' class='collapsed' title='click to expand/collapse'>",
-            json,
-            "</textarea>"
-        ].join(''));
+        //showProgress('displaying output...', 0, 1);
+        showProgress('saving output...', 0, 1);
+        saveText(risText, "risText.ris.txt");
+
+        //body.prepend([
+        //    "<div id='risOutput' class='collapsed' title='click to expand/collapse'>",
+        //    risText,
+        //    "</div>"
+        //].join(''));
+        //body.prepend([
+        //    "<textarea id='output' class='collapsed' title='click to expand/collapse'>",
+        //    json,
+        //    "</textarea>"
+        //].join(''));
 
         function toggle(target) {
             if (target.hasClass('collapsed')) {

@@ -84,6 +84,9 @@
             return filtered;
         }
 
+
+
+
         var citations = [];
         var rows = $('#assignedstudy-table > tbody > tr');
         var len = rows.length;
