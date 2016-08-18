@@ -250,11 +250,13 @@
                         });
                         break;
                     case "Reviewer comments":
+                    case "Reviewer Comments":
                         appendLine('C6', field.value);
                         break;
 
 
                     case "Reason for exclusion":
+                    case "Reason for Exclusion":
                         // do nothing
                         break;
                 }

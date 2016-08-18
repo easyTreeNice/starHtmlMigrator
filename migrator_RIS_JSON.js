@@ -74,7 +74,9 @@
             $.each(fields, function (idx, field) {
                 switch (field.column) {
                     case "Reviewer comments":
+                    case "Reviewer Comments":
                     case "Reason for exclusion":
+                    case "Reason for Exclusion":
                     case "Study Type":
                     case "Study Sub Type":
                         filtered.push(field);
